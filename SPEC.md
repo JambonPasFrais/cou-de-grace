@@ -49,7 +49,7 @@ Format d'une blague :
 | `id` | kebab-case, 24 caractères au plus, unique. **Jamais renommé ni réutilisé** : c'est lui qui est stocké, et le renommer fait revenir la blague chez ceux qui l'ont déjà vue. |
 | `setup` | un paragraphe ou plus, rien de vide. Une ligne de dialogue par paragraphe. |
 | `punchline` | un paragraphe ou plus, rien de vide. Il reste caché jusqu'à ce qu'on le révèle. |
-| `trash` | booléen. `true` pour une blague vulgaire, scatologique ou grivoise. |
+| `trash` | booléen. `true` pour une blague vulgaire, scatologique, grivoise ou gore. |
 | `source` | `name` est obligatoire. `url` est en `https`, et peut être omis pour une création originale (`name: "Création originale"`). |
 
 ## 3. Déroulé

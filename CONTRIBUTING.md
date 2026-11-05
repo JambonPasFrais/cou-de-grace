@@ -15,8 +15,8 @@ Une blague entre dans la banque si :
 - elle est réécrite avec vos mots, sans copier-coller un livre ou un spectacle,
   et sa source est citée.
 
-Une blague vulgaire, grivoise ou gore est la bienvenue, mais elle est marquée
-`trash` : elle n'apparaît que si le lecteur active l'interrupteur.
+Une blague vulgaire, scatologique, grivoise ou gore est la bienvenue, mais elle
+est marquée `trash` : elle n'apparaît que si le lecteur active l'interrupteur.
 
 ## Première façon : le formulaire
 
@@ -47,7 +47,7 @@ Ajoutez une entrée **à la fin** de `src/data/jokes.js` :
 | `id` | kebab-case, 24 caractères au plus, unique. **Ne renommez ni ne réutilisez jamais un identifiant existant** : c'est lui que les navigateurs gardent en mémoire, et le changer fait revenir la blague chez tous ceux qui l'ont déjà vue. |
 | `setup` | l'amorce, un paragraphe par élément. Une réplique de dialogue par paragraphe, qui commence par « — ». |
 | `punchline` | la chute, même format. Elle reste cachée jusqu'à ce que le lecteur la révèle. |
-| `trash` | `true` pour une blague vulgaire, grivoise ou gore, sinon `false`. |
+| `trash` | `true` pour une blague vulgaire, scatologique, grivoise ou gore, sinon `false`. |
 | `source` | `name` obligatoire ; `url` en `https`, ou pas d'`url` du tout pour une création originale (`name: 'Création originale'`). |
 
 Écrivez avec des espaces ordinaires : les espaces fines avant `? ! : ;` et dans

@@ -84,7 +84,7 @@ Il n'y a aucun fichier de police à charger. On utilise deux piles système :
 | Interface | 1 rem |
 | Amorce | 1,375 rem sur ordinateur, 1,125 rem sur téléphone |
 | Chute | 1,625 rem, en gras, sur ordinateur ; 1,25 rem sur téléphone |
-| Message d'épuisement | 2,25 rem |
+| Message d'épuisement | 2,25 rem sur ordinateur, 1,75 rem sur téléphone |
 | Nom du site | 1,5 rem |
 
 - **Dialogues** : chaque paragraphe qui commence par « — » est une réplique.
@@ -103,11 +103,11 @@ Il n'y a aucun fichier de police à charger. On utilise deux piles système :
 | Chute cachée | avant la révélation, la place de la chute est réservée (pas de saut de mise en page), avec un filet pointillé `--filet` et l'invitation « Prêt à achever vos collègues ? » en `--encre-pale` |
 | Bouton principal | fond `--sang`, texte `--sang-ink`, coins de 6 px, 3,25 rem de haut. « Achever » avant la chute, « Victime suivante » après. Le raccourci est indiqué à côté, en `--encre-pale` : touche « Espace » dessinée en cartouche |
 | Source | sous la chute, en `--encre-pale` et 0,875 rem : « Source : Bored Panda », avec un lien qui s'ouvre dans un nouvel onglet. Elle n'apparaît qu'après la chute |
-| Interrupteur trash | interrupteur à glissière, coupé par défaut. Son libellé est « Âmes sensibles s'abstenir », avec en dessous « Ajoute 6 blagues vulgaires. À éviter en réunion client. ». L'état est porté par la position et par le texte, pas seulement par la couleur |
+| Interrupteur trash | interrupteur à glissière, coupé par défaut. Son libellé est « Âmes sensibles s'abstenir », avec en dessous « Ajoute N blagues vulgaires. À éviter en réunion client. », N étant calculé sur la banque. Un mot « Coupé » ou « Activé » en `--encre-pale` suit la piste : l'état est porté par la position et par le texte, pas seulement par la couleur |
 | Poche de sang | §3 |
 | Pied de page | « Transfusion » (bouton secondaire), « Proposer une blague » (lien externe, avec une icône de flèche sortante) et « À propos » |
 | Bouton secondaire | contour `--encre` de 1,5 px, fond transparent |
-| Dialogue de transfusion | `<dialog>` natif sur `--velours` : le titre « Transfusion ? », puis le texte « La réserve sera remise à plein. Les blagues déjà vues pourront revenir. », et les boutons « Transfuser » (principal) et « Annuler » (secondaire). Échap annule |
+| Dialogue de transfusion | `<dialog>` natif sur `--velours` : le titre « Transfusion ? », puis le texte « La réserve sera remise à plein. Les blagues déjà vues pourront revenir. », et les boutons « Transfuser » (principal) et « Annuler » (secondaire, qui reçoit le focus à l'ouverture). Échap annule |
 | Écran d'épuisement | dans la carte de la blague : la poche vide en grand, le message en didone, puis au besoin la ligne « Il reste 4 blagues pour les estomacs solides » avec l'interrupteur juste en dessous, puis « Transfusion » en bouton principal et « Proposer une blague » |
 | Bandeau de stockage | bande fine en haut de page, sur fond `--velours` avec un filet `--or` : « Vos blagues vues ne seront pas gardées dans ce navigateur. » |
 | Icône du site | `favicon.svg` : une goutte `--poche` sur un carré arrondi `--nuit`, avec deux points de morsure en `--velours`. Le même dessin, à fond perdu, sert de `apple-touch-icon.png` (180 px) |
@@ -138,7 +138,7 @@ Vouvoiement, phrases courtes, humour noir, jamais d'insulte envers le lecteur.
 | Passer à la suivante | « Victime suivante » |
 | Chute pas encore révélée | « Prêt à achever vos collègues ? » |
 | Jauge | « Réserve » et « 27 / 34 » |
-| Interrupteur trash | « Âmes sensibles s'abstenir » et « Ajoute 6 blagues vulgaires. À éviter en réunion client. » |
+| Interrupteur trash | « Âmes sensibles s'abstenir », « Ajoute 4 blagues vulgaires. À éviter en réunion client. » (nombre calculé, singulier à 1), et l'état « Coupé » ou « Activé » |
 | Blagues trash restantes | « Il reste 4 blagues pour les estomacs solides. » (« Il reste 1 blague… » au singulier) |
 | Remise à zéro | « Transfusion » |
 | Dialogue de transfusion | « Transfusion ? », puis « La réserve sera remise à plein. Les blagues déjà vues pourront revenir. », puis « Transfuser » et « Annuler » |

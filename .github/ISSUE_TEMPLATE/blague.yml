@@ -31,17 +31,17 @@ body:
       label: Registre
       options:
         - Tout public
-        - Trash (vulgaire, grivois, gore)
+        - Trash (vulgaire, scatologique, grivois, gore)
     validations:
       required: true
   - type: input
     id: source
     attributes:
       label: Source
-      description: Le nom et le lien de la source, ou « Création originale ».
+      description: Le nom et le lien de la source, ou « Création originale » si vous l'avez inventée.
       placeholder: "Phortail, https://phortail.org/blagues/animaux-0921.html"
     validations:
-      required: false
+      required: true
   - type: checkboxes
     id: charte
     attributes:
