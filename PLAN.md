@@ -9,9 +9,17 @@ validée le 05/11/2026.
 
 | Étape | État |
 |---|---|
-| 1 | faite le 05/11/2026, non commitée : 11 tests verts, serveur en `200`, captures claire et sombre conformes (fonds `#f6efe8` et `#14090c`) ; `tests/index.html` garde les couleurs en dur de geo-train, comme outil de développement |
+| 1 | faite le 05/11/2026, commit `c6fadb9` : 11 tests verts, serveur en `200`, captures claire et sombre conformes ; `tests/index.html` garde les couleurs en dur de geo-train, comme outil de développement |
+| 2 | faite le 05/11/2026, commit `93ce42f` ; CLAUDE.md, README.md et CONTRIBUTING.md à relire par Armand |
 | 3 | faite les 04 et 05/11/2026 : trois collectes (environ 100 candidates), puis des calembours français et des créations originales, faute de stock suffisant |
-| 4 | faite le 05/11/2026 : 44 blagues validées une par une par Armand (40 + 4 trash) dans `src/data/jokes.js`, format contrôlé sous Node |
+| 4 | faite le 05/11/2026 : 44 blagues validées une par une par Armand (40 + 4 trash) dans `src/data/jokes.js`, format contrôlé sous Node, commit `1adb9c6` |
+| 5 | faite le 05/11/2026, commit `3955c55` |
+| 6 | faite le 05/11/2026, commit `fb50d9d` : 58 tests verts au total |
+| 9 | faite le 05/11/2026, commit `09a9f78` ; le label `blague` est à créer par Armand sur GitHub |
+| 7 | faite le 05/11/2026, commit `e58c62c` : smoke vert (trois révélations à la barre d'espace, aucune redite après rechargement) ; vide entre la carte et le bouton corrigé à l'étape 8 |
+| 8 | faite le 05/11/2026, commit `07b48e7` : smoke de 29 contrôles verts (épuisement, ligne trash, transfusion qui laisse `geotrain:v1` intact, À propos, longue blague sans défilement à 1280 × 720, sans animation) ; bandeau de stockage non vérifié en rendu |
+| 11 | contrôle du verifier le 05/11/2026 : 1 bloquant (Entrée sur l'épuisement transfusait sans confirmation), 1 important (`aria-live` recréé à chaque rendu) et 10 mineurs. Tous corrigés (commits `b1d2d00` et `53097f5`), smoke de 37 contrôles verts |
+| 10 | à faire par Armand : scénarios manuels de SPEC §11 sur ordinateur et téléphone, puis l'Action sur la PR après le push |
 
 ## Branches, commits, push
 
