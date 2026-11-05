@@ -1,0 +1,22 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+:focus-visible {
+  outline: 2px solid var(--or);
+  outline-offset: 2px;
+}
+
+#app {
+  display: block;
+}
+
+a {
+  color: var(--sang);
+}
+
+p {
+  margin: 0;
+}

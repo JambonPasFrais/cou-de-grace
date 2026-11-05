@@ -1,0 +1,222 @@
+.joke {
+  display: grid;
+  grid-template-columns: 1fr min(40rem, 100%) 1fr;
+  grid-template-rows: auto 1fr auto auto auto;
+  grid-template-areas:
+    '. entete .'
+    '. carte jauge'
+    '. actions jauge'
+    '. interrupteur jauge'
+    '. pied .';
+  column-gap: 2rem;
+  height: 100dvh;
+  padding: 1rem 1.5rem;
+}
+
+.entete {
+  grid-area: entete;
+  text-align: center;
+}
+
+.entete__nom {
+  margin: 0;
+  font-family: var(--police-titre);
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.entete__devise {
+  margin-top: 0.25rem;
+  color: var(--encre-pale);
+}
+
+.joke > .carte {
+  grid-area: carte;
+}
+
+.joke > .actions {
+  grid-area: actions;
+}
+
+.joke > .interrupteur {
+  grid-area: interrupteur;
+}
+
+.joke > .jauge {
+  grid-area: jauge;
+  align-self: center;
+  justify-self: start;
+}
+
+.joke > .pied {
+  grid-area: pied;
+}
+
+.carte {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-self: center;
+  min-height: 0;
+  max-height: 100%;
+  margin: 1.25rem 0 1rem;
+  border: 1px solid var(--filet);
+  border-radius: 4px;
+  background: var(--velours);
+}
+
+.carte__ornement {
+  position: absolute;
+  top: -0.5rem;
+  left: 50%;
+  width: 3rem;
+  height: 1rem;
+  padding: 0 0.25rem;
+  transform: translateX(-50%);
+  background: var(--velours);
+  fill: var(--or);
+}
+
+.carte__contenu {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 1.75rem 1.5rem 1.5rem;
+}
+
+.amorce {
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+  font-size: 1.375rem;
+  line-height: 1.4;
+}
+
+.chute {
+  display: grid;
+  margin-top: 1.25rem;
+}
+
+.chute > * {
+  grid-area: 1 / 1;
+}
+
+.chute__mesure {
+  visibility: hidden;
+}
+
+.chute__texte {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  font-size: 1.625rem;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.chute__revelee {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.chute__invite {
+  align-self: start;
+  padding-top: 1rem;
+  border-top: 2px dotted var(--filet);
+  color: var(--encre-pale);
+}
+
+.chute__revelee .replique__tiret {
+  color: var(--sang);
+}
+
+.source {
+  color: var(--encre-pale);
+  font-size: 0.875rem;
+}
+
+.vide {
+  padding: 2rem 0;
+  font-family: var(--police-titre);
+  font-size: 2.25rem;
+  text-align: center;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.actions[hidden] {
+  display: none;
+}
+
+.pied {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem 1.5rem;
+  padding-top: 1rem;
+}
+
+@media (max-width: 899px) {
+  .joke {
+    grid-template-columns: 100%;
+    grid-template-rows: auto auto 1fr auto auto;
+    grid-template-areas:
+      'entete'
+      'jauge'
+      'carte'
+      'interrupteur'
+      'pied';
+    padding: 0.75rem 1rem 5.5rem;
+  }
+
+  .joke > .jauge {
+    justify-self: stretch;
+    margin-top: 0.75rem;
+  }
+
+  .carte {
+    align-self: start;
+  }
+
+  .pied {
+    gap: 0.5rem 1rem;
+  }
+
+  .amorce {
+    font-size: 1.125rem;
+  }
+
+  .chute__texte {
+    font-size: 1.25rem;
+  }
+
+  .vide {
+    font-size: 1.75rem;
+  }
+
+  .actions {
+    position: fixed;
+    inset: auto 0 0 0;
+    margin: 0;
+    padding: 0.75rem 1rem;
+    background: var(--nuit);
+    border-top: 1px solid var(--filet);
+  }
+
+  .actions .bouton {
+    flex: 1;
+  }
+
+  .cartouche {
+    display: none;
+  }
+}
