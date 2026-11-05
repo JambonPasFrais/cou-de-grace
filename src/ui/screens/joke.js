@@ -270,6 +270,7 @@ export function jokeScreen() {
     syncSwitch();
     draw();
     updateGauge({ rise: true });
+    primary.focus();
   }
 
   function toggleTrash() {
