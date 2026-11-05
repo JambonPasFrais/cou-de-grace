@@ -1,5 +1,5 @@
-import { readState, writeState } from '../core/storage.js';
 import { defaultState } from '../core/reserve.js';
+import { parseState, serializeState, STORAGE_KEY, writeState } from '../core/storage.js';
 
 const PROBE_KEY = 'coudegrace:test';
 
@@ -35,16 +35,28 @@ export function probeStorage() {
   return available;
 }
 
-export function loadState(knownIds) {
+let shared = defaultState();
+
+export function initState(knownIds) {
   try {
-    return readState(window.localStorage, knownIds);
+    const raw = window.localStorage.getItem(STORAGE_KEY);
+    shared = parseState(raw, knownIds);
+    if (serializeState(shared) !== raw) {
+      writeState(window.localStorage, shared);
+    }
   } catch {
     markUnavailable();
-    return defaultState();
+    shared = defaultState();
   }
+  return shared;
+}
+
+export function getState() {
+  return shared;
 }
 
 export function saveState(state) {
+  shared = state;
   try {
     writeState(window.localStorage, state);
     return true;

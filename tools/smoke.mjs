@@ -109,6 +109,12 @@ async function launch() {
     await cdp.send('Input.dispatchKeyEvent', { type: 'keyUp', ...key });
   };
 
+  const pressEnter = async () => {
+    const key = { key: 'Enter', code: 'Enter', windowsVirtualKeyCode: 13, nativeVirtualKeyCode: 13 };
+    await cdp.send('Input.dispatchKeyEvent', { type: 'keyDown', text: '\r', ...key });
+    await cdp.send('Input.dispatchKeyEvent', { type: 'keyUp', ...key });
+  };
+
   const close = async () => {
     cdp.close();
     const exited = new Promise(resolve => chrome.once('exit', resolve));
@@ -117,7 +123,7 @@ async function launch() {
     await rm(profile, { recursive: true, force: true, maxRetries: 10, retryDelay: 100 });
   };
 
-  return { cdp, evaluate, waitFor, navigate, pressSpace, close };
+  return { cdp, evaluate, waitFor, navigate, pressSpace, pressEnter, close };
 }
 
 const cardState = state => `document.querySelector('.carte')?.dataset.state === ${JSON.stringify(state)}`;
@@ -200,6 +206,18 @@ async function main(base) {
     const afterReload = await cardId(browser);
     report(!revealed.includes(afterReload), 'rechargement sans doublon', afterReload);
 
+    await browser.navigate(base);
+    await browser.waitFor(cardState('setup'));
+    const unrevealed = await cardId(browser);
+    await browser.navigate(base);
+    await browser.waitFor(cardState('setup'));
+    const afterSecondReload = JSON.parse((await stored(STORAGE_KEY)) ?? 'null');
+    report(
+      afterSecondReload !== null && afterSecondReload.seen.length === 3 && !afterSecondReload.seen.includes(unrevealed),
+      'chute non révélée non comptée',
+      `${unrevealed} · ${JSON.stringify(afterSecondReload?.seen)}`,
+    );
+
     const gauge = await browser.evaluate("document.querySelector('[role=\"meter\"]')?.getAttribute('aria-valuenow')");
     report(gauge === '37', 'jauge', `aria-valuenow = ${gauge}`);
     report(true, 'capture', SCREENSHOT);
@@ -223,6 +241,24 @@ async function main(base) {
     await capture('epuisement-1440-sombre');
     await media(false, false);
 
+    const beforeEnter = await stored(STORAGE_KEY);
+    await browser.evaluate('document.activeElement.blur()');
+    await browser.pressEnter();
+    await sleep(200);
+    const dialogState = await browser.evaluate(
+      '({ open: document.querySelector("dialog").open, label: document.activeElement?.textContent ?? null })',
+    );
+    report(
+      dialogState.open === true && plain(dialogState.label ?? '') === 'Annuler' && (await stored(STORAGE_KEY)) === beforeEnter,
+      'Entrée ouvre le dialogue sans transfuser',
+      `ouvert = ${dialogState.open} · focus « ${dialogState.label} » · stockage inchangé = ${(await stored(STORAGE_KEY)) === beforeEnter}`,
+    );
+    await browser.evaluate('document.querySelector("dialog").close()');
+    await browser.evaluate('document.activeElement.blur()');
+
+    const stateWord = await text('.interrupteur__etat');
+    report(stateWord === 'Coupé', 'état visible de l\'interrupteur', `« ${stateWord} »`);
+
     await click('[role="switch"]');
     await browser.evaluate('document.activeElement.blur()');
     await browser.waitFor(cardState('setup'));
@@ -231,6 +267,10 @@ async function main(base) {
     await exhaust();
     const goneLine = await text('.epuise__trash');
     report(goneLine === null, 'ligne trash disparue', String(goneLine));
+
+    const stateWordOn = await text('.interrupteur__etat');
+    report(stateWordOn === 'Activé', 'état visible activé', `« ${stateWordOn} »`);
+    const messageBefore = plain((await text('.epuise__message')) ?? '');
 
     await click('[data-testid="transfusion-footer"]');
     await browser.waitFor('document.querySelector("dialog")?.open === true');
@@ -244,6 +284,13 @@ async function main(base) {
     report((await stored(STORAGE_KEY)) === null, 'clé coudegrace:v1 absente', String(await stored(STORAGE_KEY)));
     report((await stored(FOREIGN_KEY)) === '{"x":1}', 'clé geotrain:v1 intacte', String(await stored(FOREIGN_KEY)));
     report((await stored(PROBE_KEY)) === null, 'aucune clé coudegrace:test', String(await stored(PROBE_KEY)));
+    await exhaust();
+    const messageAfter = plain((await text('.epuise__message')) ?? '');
+    report(
+      messageAfter !== '' && messageAfter !== messageBefore,
+      'message d\'épuisement différent du précédent',
+      `« ${messageBefore} » puis « ${messageAfter} »`,
+    );
 
     await browser.evaluate("location.hash = '#/a-propos'");
     await browser.waitFor("document.querySelector('.apropos') !== null");
@@ -298,6 +345,34 @@ async function main(base) {
     const animations = await browser.evaluate('document.getAnimations().length');
     report(animations === 0, 'sans animation', `document.getAnimations().length = ${animations}`);
     await media(false, false);
+
+    const keys = JSON.parse(await browser.evaluate('JSON.stringify(Object.keys(localStorage))'));
+    report(
+      keys.every(key => key === FOREIGN_KEY || key === STORAGE_KEY) && keys.includes(FOREIGN_KEY),
+      'clés du localStorage',
+      keys.join(', '),
+    );
+
+    const blocker = await browser.cdp.send('Page.addScriptToEvaluateOnNewDocument', {
+      source: "Storage.prototype.setItem = function () { throw new DOMException('bloqué', 'QuotaExceededError'); };",
+    });
+    await browser.navigate(base);
+    await browser.waitFor(cardState('setup'));
+    const bannerText = plain((await text('.bandeau')) ?? '');
+    const bannerShown = await browser.evaluate("document.querySelector('.bandeau')?.hidden === false");
+    report(
+      bannerShown && bannerText === 'Vos blagues vues ne seront pas gardées dans ce navigateur.',
+      'stockage bloqué : bandeau',
+      `« ${bannerText} » · visible = ${bannerShown}`,
+    );
+    await browser.pressSpace();
+    const usable = await browser
+      .waitFor(cardState('revealed'))
+      .then(() => true)
+      .catch(() => false);
+    report(usable, 'stockage bloqué : révélation possible', String(usable));
+    await browser.cdp.send('Page.removeScriptToEvaluateOnNewDocument', { identifier: blocker.identifier });
+    await browser.navigate(base);
   } catch (error) {
     report(false, 'parcours', error.message);
   } finally {

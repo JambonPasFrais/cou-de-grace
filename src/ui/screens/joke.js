@@ -6,11 +6,12 @@ import { JOKES } from '../../data/jokes.js';
 import { button, div, el, text } from '../dom.js';
 import { createEmptyPouch, createGauge } from '../gauge.js';
 import { createHeader } from '../header.js';
-import { loadState, saveState } from '../persistence.js';
+import { getState, saveState } from '../persistence.js';
 import { svg } from '../svg.js';
 
 const CONTRIBUTE_URL = 'https://github.com/JambonPasFrais/cou-de-grace/issues/new?template=blague.yml';
 const IGNORED_TARGETS = 'button, a, input, textarea, select, [role="switch"]';
+const ORIGINAL_SOURCE = 'Création originale';
 let lastExhaustion = null;
 const TRASH_COUNT = JOKES.filter(joke => joke.trash).length;
 
@@ -29,13 +30,10 @@ function paragraphs(list) {
 }
 
 function sourceLine(source) {
-  if (!source.url) {
-    return text('p', frenchSpacing(source.name), { class: 'source' });
-  }
-  return el('p', { class: 'source' }, [
-    'Source : ',
-    text('a', frenchSpacing(source.name), { href: source.url, target: '_blank', rel: 'noopener' }),
-  ]);
+  const name = frenchSpacing(source.name);
+  const label = source.name === ORIGINAL_SOURCE ? null : 'Source : ';
+  const content = source.url ? text('a', name, { href: source.url, target: '_blank', rel: 'noopener' }) : name;
+  return el('p', { class: 'source' }, [label, content]);
 }
 
 function fangs() {
@@ -69,11 +67,11 @@ function trashDescription() {
 }
 
 export function jokeScreen() {
-  const ids = JOKES.map(joke => joke.id);
-  let state = loadState(ids);
+  let state = getState();
   let current = null;
   let revealed = false;
   let exhaustion = null;
+  let builtFor = null;
 
   const reserve = createGauge();
 
@@ -90,6 +88,7 @@ export function jokeScreen() {
     id: 'trash-note',
     class: 'interrupteur__note',
   });
+  const switchState = text('span', '', { class: 'interrupteur__etat', 'aria-hidden': 'true' });
   const trashSwitch = button(
     {
       class: 'interrupteur',
@@ -100,7 +99,10 @@ export function jokeScreen() {
       on: { click: () => toggleTrash() },
     },
     [
-      div({ class: 'interrupteur__piste', 'aria-hidden': 'true' }, [div({ class: 'interrupteur__pouce' })]),
+      div({ class: 'interrupteur__controle' }, [
+        div({ class: 'interrupteur__piste', 'aria-hidden': 'true' }, [div({ class: 'interrupteur__pouce' })]),
+        switchState,
+      ]),
       div({ class: 'interrupteur__textes' }, [switchLabel, switchNote]),
     ],
   );
@@ -125,7 +127,9 @@ export function jokeScreen() {
       button({ class: 'bouton', 'data-testid': 'transfusion-confirm', on: { click: () => transfuseNow() } }, [
         frenchSpacing('Transfuser'),
       ]),
-      button({ class: 'bouton-secondaire', on: { click: () => dialog.close() } }, [frenchSpacing('Annuler')]),
+      button({ class: 'bouton-secondaire', autofocus: true, on: { click: () => dialog.close() } }, [
+        frenchSpacing('Annuler'),
+      ]),
     ]),
   ]);
 
@@ -138,6 +142,13 @@ export function jokeScreen() {
     dialog,
   ]);
 
+  const live = div({ class: 'chute__live', 'aria-live': 'polite' });
+
+  function syncSwitch() {
+    trashSwitch.setAttribute('aria-checked', String(state.trash));
+    switchState.textContent = state.trash ? 'Activé' : 'Coupé';
+  }
+
   const allowed = () => allowedJokes(JOKES, state.trash);
   const updateGauge = options => reserve.update(gauge(allowed(), state.seen), options);
 
@@ -149,6 +160,7 @@ export function jokeScreen() {
       const showTrash = !state.trash && remaining > 0;
       card.dataset.state = 'exhausted';
       delete card.dataset.jokeId;
+      builtFor = null;
       card.replaceChildren(
         fangs(),
         div({ class: 'carte__contenu' }, [
@@ -175,11 +187,6 @@ export function jokeScreen() {
     card.dataset.state = revealed ? 'revealed' : 'setup';
     card.dataset.jokeId = current.id;
 
-    const sizer = div({ class: 'chute__mesure', 'aria-hidden': 'true' }, [
-      div({ class: 'chute__texte' }, paragraphs(current.punchline)),
-      sourceLine(current.source),
-    ]);
-
     const slot = revealed
       ? div({ class: 'chute__revelee' }, [
           div({ class: 'chute__texte' }, paragraphs(current.punchline)),
@@ -187,13 +194,23 @@ export function jokeScreen() {
         ])
       : text('p', frenchSpacing('Prêt à achever vos collègues ?'), { class: 'chute__invite', 'aria-hidden': 'true' });
 
-    card.replaceChildren(
-      fangs(),
-      div({ class: 'carte__contenu' }, [
-        div({ class: 'amorce' }, paragraphs(current.setup)),
-        div({ class: 'chute', 'aria-live': 'polite' }, [sizer, slot]),
-      ]),
-    );
+    if (builtFor !== current.id) {
+      const sizer = div({ class: 'chute__mesure', 'aria-hidden': 'true' }, [
+        div({ class: 'chute__texte' }, paragraphs(current.punchline)),
+        sourceLine(current.source),
+      ]);
+      live.replaceChildren(slot);
+      card.replaceChildren(
+        fangs(),
+        div({ class: 'carte__contenu' }, [
+          div({ class: 'amorce' }, paragraphs(current.setup)),
+          div({ class: 'chute' }, [sizer, live]),
+        ]),
+      );
+      builtFor = current.id;
+    } else {
+      live.replaceChildren(slot);
+    }
 
     primary.replaceChildren(frenchSpacing(revealed ? 'Victime suivante' : 'Achever'));
     return slot;
@@ -250,7 +267,7 @@ export function jokeScreen() {
     dialog.close();
     state = transfuse();
     saveState(state);
-    trashSwitch.setAttribute('aria-checked', String(state.trash));
+    syncSwitch();
     draw();
     updateGauge({ rise: true });
   }
@@ -258,7 +275,7 @@ export function jokeScreen() {
   function toggleTrash() {
     state = setTrash(state, !state.trash);
     saveState(state);
-    trashSwitch.setAttribute('aria-checked', String(state.trash));
+    syncSwitch();
     const cut = current !== null && !revealed && current.trash && !state.trash;
     if (cut || current === null) {
       draw();
@@ -285,12 +302,11 @@ export function jokeScreen() {
     if (event.target instanceof Element && event.target.closest(IGNORED_TARGETS)) {
       return;
     }
-    if (isSpace) {
-      event.preventDefault();
-    }
+    event.preventDefault();
     act();
   });
 
+  syncSwitch();
   draw();
   updateGauge();
   return root;

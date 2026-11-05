@@ -66,6 +66,19 @@
   cursor: pointer;
 }
 
+.interrupteur__controle {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.125rem;
+}
+
+.interrupteur__etat {
+  color: var(--encre-pale);
+  font-size: 0.75rem;
+}
+
 .interrupteur__piste {
   flex: none;
   width: 2.75rem;
