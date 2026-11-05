@@ -20,3 +20,49 @@ a {
 p {
   margin: 0;
 }
+
+body {
+  display: flex;
+  flex-direction: column;
+}
+
+body:has(.joke) {
+  height: 100dvh;
+}
+
+#app {
+  flex: 1;
+  min-height: 0;
+}
+
+.bandeau {
+  flex: none;
+  padding: 0.5rem 1rem;
+  border-bottom: 1px solid var(--or);
+  background: var(--velours);
+  color: var(--encre);
+  font-size: 0.875rem;
+  text-align: center;
+}
+
+.bandeau[hidden] {
+  display: none;
+}
+
+.entete {
+  text-align: center;
+}
+
+.entete__nom {
+  margin: 0;
+  font-family: var(--police-titre);
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.entete__devise {
+  margin-top: 0.25rem;
+  color: var(--encre-pale);
+}

@@ -1,14 +1,17 @@
 import { allowedJokes } from '../../core/bank.js';
-import { drawJoke, gauge, reveal, setTrash } from '../../core/reserve.js';
+import { EXHAUSTION_MESSAGES, pickExhaustion } from '../../core/exhaustion.js';
+import { drawJoke, gauge, reveal, setTrash, transfuse, trashLeft } from '../../core/reserve.js';
 import { frenchSpacing } from '../../core/typography.js';
 import { JOKES } from '../../data/jokes.js';
 import { button, div, el, text } from '../dom.js';
-import { createGauge } from '../gauge.js';
+import { createEmptyPouch, createGauge } from '../gauge.js';
+import { createHeader } from '../header.js';
 import { loadState, saveState } from '../persistence.js';
 import { svg } from '../svg.js';
 
 const CONTRIBUTE_URL = 'https://github.com/JambonPasFrais/cou-de-grace/issues/new?template=blague.yml';
 const IGNORED_TARGETS = 'button, a, input, textarea, select, [role="switch"]';
+let lastExhaustion = null;
 const TRASH_COUNT = JOKES.filter(joke => joke.trash).length;
 
 const prefersReducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -48,6 +51,18 @@ function arrow() {
   ]);
 }
 
+function contributeLink() {
+  return el('a', { class: 'lien', href: CONTRIBUTE_URL, target: '_blank', rel: 'noopener' }, [
+    frenchSpacing('Proposer une blague'),
+    arrow(),
+  ]);
+}
+
+function trashLeftLine(count) {
+  const plural = count > 1 ? 's' : '';
+  return `Il reste ${count} blague${plural} pour les estomacs solides.`;
+}
+
 function trashDescription() {
   const plural = TRASH_COUNT > 1 ? 's' : '';
   return `Ajoute ${TRASH_COUNT} blague${plural} vulgaire${plural}. À éviter en réunion client.`;
@@ -58,6 +73,7 @@ export function jokeScreen() {
   let state = loadState(ids);
   let current = null;
   let revealed = false;
+  let exhaustion = null;
 
   const reserve = createGauge();
 
@@ -90,36 +106,66 @@ export function jokeScreen() {
   );
 
   const footer = el('footer', { class: 'pied' }, [
-    button({ class: 'bouton-secondaire' }, [frenchSpacing('Transfusion')]),
-    el('a', { class: 'lien', href: CONTRIBUTE_URL, target: '_blank', rel: 'noopener' }, [
-      frenchSpacing('Proposer une blague'),
-      arrow(),
-    ]),
+    button(
+      { class: 'bouton-secondaire', 'data-testid': 'transfusion-footer', on: { click: () => openTransfusion() } },
+      [frenchSpacing('Transfusion')],
+    ),
+    contributeLink(),
     text('a', frenchSpacing('À propos'), { class: 'lien', href: '#/a-propos' }),
   ]);
 
-  const root = div({ class: 'joke' }, [
-    el('header', { class: 'entete' }, [
-      text('h1', frenchSpacing('Le cou de grâce'), { class: 'entete__nom' }),
-      text('p', frenchSpacing('Achevez vos collègues façon vampire'), { class: 'entete__devise' }),
+  const switchSlot = div({ class: 'interrupteur-emplacement' }, [trashSwitch]);
+
+  const dialog = el('dialog', { class: 'dialogue', 'aria-labelledby': 'transfusion-titre' }, [
+    text('h2', frenchSpacing('Transfusion ?'), { id: 'transfusion-titre', class: 'dialogue__titre' }),
+    text('p', frenchSpacing('La réserve sera remise à plein. Les blagues déjà vues pourront revenir.'), {
+      class: 'dialogue__texte',
+    }),
+    div({ class: 'dialogue__actions' }, [
+      button({ class: 'bouton', 'data-testid': 'transfusion-confirm', on: { click: () => transfuseNow() } }, [
+        frenchSpacing('Transfuser'),
+      ]),
+      button({ class: 'bouton-secondaire', on: { click: () => dialog.close() } }, [frenchSpacing('Annuler')]),
     ]),
-    card,
-    actions,
-    trashSwitch,
-    reserve.node,
+  ]);
+
+  const root = div({ class: 'joke' }, [
+    div({ class: 'centre' }, [
+      div({ class: 'bloc' }, [createHeader(), card, actions, switchSlot]),
+      reserve.node,
+    ]),
     footer,
+    dialog,
   ]);
 
   const allowed = () => allowedJokes(JOKES, state.trash);
   const updateGauge = options => reserve.update(gauge(allowed(), state.seen), options);
 
   function renderCard() {
+    switchSlot.append(trashSwitch);
+
     if (current === null) {
-      card.dataset.state = 'empty';
+      const remaining = trashLeft(JOKES, state.seen);
+      const showTrash = !state.trash && remaining > 0;
+      card.dataset.state = 'exhausted';
       delete card.dataset.jokeId;
       card.replaceChildren(
         fangs(),
-        div({ class: 'carte__contenu' }, [text('p', frenchSpacing('Plus aucune blague.'), { class: 'vide' })]),
+        div({ class: 'carte__contenu' }, [
+          div({ class: 'epuise' }, [
+            createEmptyPouch(),
+            text('p', frenchSpacing(exhaustion), { class: 'epuise__message' }),
+            showTrash ? text('p', frenchSpacing(trashLeftLine(remaining)), { class: 'epuise__trash' }) : null,
+            showTrash ? trashSwitch : null,
+            div({ class: 'epuise__actions' }, [
+              button(
+                { class: 'bouton', 'data-testid': 'transfusion-card', on: { click: () => openTransfusion() } },
+                [frenchSpacing('Transfusion')],
+              ),
+              contributeLink(),
+            ]),
+          ]),
+        ]),
       );
       actions.hidden = true;
       return;
@@ -156,11 +202,18 @@ export function jokeScreen() {
   function draw() {
     current = drawJoke(allowed(), state.seen, Math.random);
     revealed = false;
+    if (current === null && exhaustion === null) {
+      lastExhaustion = pickExhaustion(lastExhaustion, Math.random);
+      exhaustion = EXHAUSTION_MESSAGES[lastExhaustion];
+    } else if (current !== null) {
+      exhaustion = null;
+    }
     renderCard();
   }
 
   function act() {
     if (current === null) {
+      openTransfusion();
       return;
     }
     if (!revealed) {
@@ -187,6 +240,21 @@ export function jokeScreen() {
     }
   }
 
+  function openTransfusion() {
+    if (!dialog.open) {
+      dialog.showModal();
+    }
+  }
+
+  function transfuseNow() {
+    dialog.close();
+    state = transfuse();
+    saveState(state);
+    trashSwitch.setAttribute('aria-checked', String(state.trash));
+    draw();
+    updateGauge({ rise: true });
+  }
+
   function toggleTrash() {
     state = setTrash(state, !state.trash);
     saveState(state);
@@ -196,11 +264,15 @@ export function jokeScreen() {
       draw();
     }
     updateGauge();
+    trashSwitch.focus();
   }
 
   document.addEventListener('keydown', function onKey(event) {
     if (!root.isConnected) {
       document.removeEventListener('keydown', onKey);
+      return;
+    }
+    if (dialog.open) {
       return;
     }
     const isSpace = event.key === ' ' || event.code === 'Space';

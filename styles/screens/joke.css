@@ -1,66 +1,39 @@
 .joke {
   display: grid;
-  grid-template-columns: 1fr min(40rem, 100%) 1fr;
-  grid-template-rows: auto 1fr auto auto auto;
-  grid-template-areas:
-    '. entete .'
-    '. carte jauge'
-    '. actions jauge'
-    '. interrupteur jauge'
-    '. pied .';
-  column-gap: 2rem;
-  height: 100dvh;
+  grid-template-rows: minmax(0, 1fr) auto;
+  height: 100%;
   padding: 1rem 1.5rem;
 }
 
-.entete {
-  grid-area: entete;
-  text-align: center;
-}
-
-.entete__nom {
-  margin: 0;
-  font-family: var(--police-titre);
-  font-size: 1.5rem;
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-}
-
-.entete__devise {
-  margin-top: 0.25rem;
-  color: var(--encre-pale);
-}
-
-.joke > .carte {
-  grid-area: carte;
-}
-
-.joke > .actions {
-  grid-area: actions;
-}
-
-.joke > .interrupteur {
-  grid-area: interrupteur;
-}
-
-.joke > .jauge {
-  grid-area: jauge;
+.centre {
+  display: grid;
+  grid-template-columns: 1fr min(40rem, 100%) 1fr;
+  column-gap: 2rem;
+  align-items: center;
   align-self: center;
-  justify-self: start;
+  max-height: 100%;
+  min-height: 0;
 }
 
-.joke > .pied {
-  grid-area: pied;
+.bloc {
+  display: flex;
+  flex-direction: column;
+  grid-column: 2;
+  max-height: 100%;
+  min-height: 0;
+}
+
+.centre > .jauge {
+  grid-column: 3;
+  justify-self: start;
 }
 
 .carte {
   position: relative;
   display: flex;
+  flex: 0 1 auto;
   flex-direction: column;
-  align-self: center;
   min-height: 0;
-  max-height: 100%;
   margin: 1.25rem 0 1rem;
   border: 1px solid var(--filet);
   border-radius: 4px;
@@ -138,11 +111,68 @@
   font-size: 0.875rem;
 }
 
-.vide {
-  padding: 2rem 0;
+.epuise {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  text-align: center;
+}
+
+.poche-vide {
+  width: 5rem;
+  height: 15rem;
+  overflow: visible;
+}
+
+.epuise__message {
   font-family: var(--police-titre);
   font-size: 2.25rem;
-  text-align: center;
+  line-height: 1.2;
+}
+
+.epuise__trash {
+  margin-top: 0.5rem;
+  color: var(--encre-pale);
+}
+
+.epuise__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem 1.5rem;
+  margin-top: 0.5rem;
+}
+
+.interrupteur-emplacement:not(:empty) {
+  margin-bottom: 0.25rem;
+}
+
+.dialogue {
+  width: min(26rem, calc(100% - 2rem));
+  padding: 1.5rem;
+  border: 1px solid var(--filet);
+  border-radius: 4px;
+  background: var(--velours);
+  color: var(--encre);
+}
+
+.dialogue::backdrop {
+  background: color-mix(in srgb, var(--nuit) 80%, transparent);
+}
+
+.dialogue__titre {
+  margin: 0 0 0.75rem;
+  font-family: var(--police-titre);
+  font-size: 1.5rem;
+}
+
+.dialogue__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 1.25rem;
 }
 
 .actions {
@@ -167,27 +197,36 @@
 
 @media (max-width: 899px) {
   .joke {
-    grid-template-columns: 100%;
-    grid-template-rows: auto auto 1fr auto auto;
-    grid-template-areas:
-      'entete'
-      'jauge'
-      'carte'
-      'interrupteur'
-      'pied';
+    display: flex;
+    flex-direction: column;
     padding: 0.75rem 1rem 5.5rem;
   }
 
-  .joke > .jauge {
-    justify-self: stretch;
+  .centre,
+  .bloc {
+    display: contents;
+  }
+
+  .joke .entete {
+    order: 1;
+  }
+
+  .centre > .jauge {
+    order: 2;
     margin-top: 0.75rem;
   }
 
   .carte {
-    align-self: start;
+    order: 3;
+    flex: 0 1 auto;
+  }
+
+  .interrupteur-emplacement {
+    order: 4;
   }
 
   .pied {
+    order: 5;
     gap: 0.5rem 1rem;
   }
 
@@ -199,7 +238,7 @@
     font-size: 1.25rem;
   }
 
-  .vide {
+  .epuise__message {
     font-size: 1.75rem;
   }
 
@@ -218,5 +257,12 @@
 
   .cartouche {
     display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .jauge--remplissage .jauge__sang,
+  .jauge--remplissage .jauge__niveau {
+    transition: none;
   }
 }

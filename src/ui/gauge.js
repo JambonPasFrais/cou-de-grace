@@ -6,6 +6,7 @@ const BODY_Y = 14;
 const BODY_HEIGHT = 320;
 const EMPTY_FLOOR = 2;
 const DROP_MS = 400;
+const RISE_MS = 700;
 
 const prefersReducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -13,6 +14,24 @@ function graduations() {
   return Array.from({ length: 10 }, (_, index) =>
     svg('line', { class: 'jauge__graduation', x1: 100, x2: 108, y1: 30 + index * 30, y2: 30 + index * 30 }),
   );
+}
+
+export function createEmptyPouch() {
+  return svg('svg', { class: 'poche-vide', viewBox: '0 0 120 380', 'aria-hidden': 'true', focusable: 'false' }, [
+    svg('defs', {}, [
+      svg('clipPath', { id: 'poche-vide-clip' }, [
+        svg('rect', { x: 20, y: BODY_Y, width: 80, height: BODY_HEIGHT, rx: 14 }),
+      ]),
+    ]),
+    svg('rect', { class: 'jauge__vide', x: 20, y: BODY_Y, width: 80, height: BODY_HEIGHT, rx: 14 }),
+    svg('g', { 'clip-path': 'url(#poche-vide-clip)' }, [
+      svg('rect', { class: 'jauge__sang', x: 20, y: BODY_Y + BODY_HEIGHT - EMPTY_FLOOR, width: 80, height: EMPTY_FLOOR }),
+    ]),
+    svg('rect', { class: 'jauge__contour', x: 20, y: BODY_Y, width: 80, height: BODY_HEIGHT, rx: 14 }),
+    svg('rect', { class: 'jauge__contour', x: 48, y: 2, width: 24, height: 12, rx: 6 }),
+    svg('path', { class: 'jauge__contour', d: 'M60 334 V362' }),
+    ...graduations(),
+  ]);
 }
 
 export function createGauge() {
@@ -47,7 +66,7 @@ export function createGauge() {
 
   const node = div({ class: 'jauge', role: 'meter', 'aria-valuemin': 0 }, [pouch, flat]);
 
-  const update = ({ left, total }, { drop: dropping = false } = {}) => {
+  const update = ({ left, total }, { drop: dropping = false, rise = false } = {}) => {
     const ratio = total === 0 ? 0 : left / total;
     const offset = left === 0 ? BODY_HEIGHT - EMPTY_FLOOR : (1 - ratio) * BODY_HEIGHT;
     blood.style.transform = `translateY(${offset}px)`;
@@ -57,6 +76,11 @@ export function createGauge() {
     node.setAttribute('aria-valuenow', left);
     node.setAttribute('aria-valuemax', total);
     node.setAttribute('aria-label', `Réserve de blagues : ${left} sur ${total}`);
+
+    if (rise && !prefersReducedMotion()) {
+      node.classList.add('jauge--remplissage');
+      setTimeout(() => node.classList.remove('jauge--remplissage'), RISE_MS);
+    }
 
     if (dropping && !prefersReducedMotion()) {
       drop.animate(

@@ -192,6 +192,14 @@
   transition: width 400ms ease-in-out;
 }
 
+.jauge--remplissage .jauge__sang {
+  transition-duration: 700ms;
+}
+
+.jauge--remplissage .jauge__niveau {
+  transition-duration: 700ms;
+}
+
 @media (max-width: 899px) {
   .jauge {
     width: 100%;
