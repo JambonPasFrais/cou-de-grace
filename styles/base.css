@@ -1,0 +1,31 @@
+:root {
+  color-scheme: light dark;
+
+  --nuit: light-dark(#f6efe8, #14090c);
+  --velours: light-dark(#fffaf5, #22121a);
+  --velours-enfonce: light-dark(#ece0d6, #0d0507);
+  --filet: light-dark(#c9b3a8, #4a2a33);
+  --encre: light-dark(#2a0f14, #f2e6dc);
+  --encre-pale: light-dark(#6e4a4f, #b9a39a);
+  --sang: light-dark(#9e1622, #e0525c);
+  --sang-ink: light-dark(#fffaf5, #14090c);
+  --poche: light-dark(#b3121f, #c21d2b);
+  --or: light-dark(#8a6416, #e3b55b);
+
+  --police-titre: 'Bodoni 72', Didot, 'Bodoni MT', 'Iowan Old Style', Georgia, serif;
+  --police-texte: 'Iowan Old Style', 'Palatino Linotype', Palatino, 'Book Antiqua', Georgia, ui-serif, serif;
+}
+
+html {
+  background: var(--nuit);
+  color: var(--encre);
+}
+
+body {
+  margin: 0;
+  min-height: 100dvh;
+  background: var(--nuit);
+  color: var(--encre);
+  font-family: var(--police-texte);
+  font-size: 1rem;
+}
