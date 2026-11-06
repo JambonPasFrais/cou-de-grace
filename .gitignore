@@ -1,0 +1,8 @@
+.DS_Store
+.vscode/
+.idea/
+*.swp
+*.log
+node_modules/
+_tmp*
+.claude/worktrees/

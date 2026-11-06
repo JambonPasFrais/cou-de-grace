@@ -1,0 +1,253 @@
+.bouton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 3.25rem;
+  padding: 0 2rem;
+  border: 0;
+  border-radius: 6px;
+  background: var(--sang);
+  color: var(--sang-ink);
+  font: inherit;
+  font-weight: 700;
+  font-size: 1.0625rem;
+  cursor: pointer;
+}
+
+.bouton-secondaire {
+  height: 2.5rem;
+  padding: 0 1rem;
+  border: 1.5px solid var(--encre);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--encre);
+  font: inherit;
+  cursor: pointer;
+}
+
+.cartouche {
+  display: inline-block;
+  padding: 0.125rem 0.5rem;
+  border: 1px solid var(--encre-pale);
+  border-bottom-width: 2px;
+  border-radius: 4px;
+  color: var(--encre-pale);
+  font: inherit;
+  font-size: 0.875rem;
+}
+
+.lien {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  color: var(--sang);
+}
+
+.icone {
+  width: 0.875rem;
+  height: 0.875rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.interrupteur {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 0.25rem 0;
+  border: 0;
+  background: transparent;
+  color: var(--encre);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.interrupteur__controle {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.125rem;
+}
+
+.interrupteur__etat {
+  color: var(--encre-pale);
+  font-size: 0.75rem;
+}
+
+.interrupteur__piste {
+  flex: none;
+  width: 2.75rem;
+  height: 1.5rem;
+  margin-top: 0.125rem;
+  padding: 2px;
+  border: 1.5px solid var(--encre);
+  border-radius: 999px;
+  background: var(--velours-enfonce);
+  transition: background-color 150ms;
+}
+
+.interrupteur__pouce {
+  width: 1.125rem;
+  height: 1.125rem;
+  border-radius: 50%;
+  background: var(--encre-pale);
+  transition: transform 150ms, background-color 150ms;
+}
+
+.interrupteur[aria-checked='true'] .interrupteur__piste {
+  background: var(--sang);
+}
+
+.interrupteur[aria-checked='true'] .interrupteur__pouce {
+  background: var(--sang-ink);
+  transform: translateX(1.25rem);
+}
+
+.interrupteur__textes {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+}
+
+.interrupteur__libelle {
+  font-weight: 700;
+}
+
+.interrupteur__note {
+  color: var(--encre-pale);
+  font-size: 0.875rem;
+}
+
+.jauge {
+  width: 8rem;
+}
+
+.jauge__poche {
+  display: block;
+  width: 8rem;
+  height: 60vh;
+  overflow: visible;
+}
+
+.jauge__vide {
+  fill: var(--velours-enfonce);
+}
+
+.jauge__sang {
+  fill: var(--poche);
+  transition: transform 400ms ease-in-out;
+}
+
+.jauge__contour {
+  fill: none;
+  stroke: var(--encre);
+  stroke-width: 1.5;
+  stroke-linecap: round;
+}
+
+.jauge__graduation {
+  stroke: var(--encre-pale);
+  stroke-width: 1.5;
+  stroke-linecap: round;
+}
+
+.jauge__etiquette {
+  fill: var(--velours);
+  stroke: var(--or);
+  stroke-width: 1.5;
+}
+
+.jauge__titre {
+  fill: var(--or);
+  font-family: var(--police-texte);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+}
+
+.jauge__nombre {
+  fill: var(--encre);
+  font-family: var(--police-texte);
+  font-size: 16px;
+  font-variant-numeric: tabular-nums lining-nums;
+}
+
+.jauge__goutte {
+  fill: var(--poche);
+  opacity: 0;
+}
+
+.jauge__horizontale {
+  display: none;
+}
+
+.jauge__texte {
+  color: var(--encre-pale);
+  font-size: 0.875rem;
+  font-variant-numeric: tabular-nums lining-nums;
+}
+
+.jauge__piste {
+  height: 0.5rem;
+  border-radius: 999px;
+  background: var(--velours-enfonce);
+  overflow: hidden;
+}
+
+.jauge__niveau {
+  height: 100%;
+  background: var(--poche);
+  transition: width 400ms ease-in-out;
+}
+
+.jauge--remplissage .jauge__sang {
+  transition-duration: 700ms;
+}
+
+.jauge--remplissage .jauge__niveau {
+  transition-duration: 700ms;
+}
+
+@media (max-width: 899px) {
+  .jauge {
+    width: 100%;
+  }
+
+  .jauge__poche {
+    display: none;
+  }
+
+  .jauge__horizontale {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .jauge__sang,
+  .jauge__niveau,
+  .interrupteur__piste,
+  .interrupteur__pouce {
+    transition: none;
+  }
+}
+
+.bouton-lien {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--sang);
+  font: inherit;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.bouton-lien--pale {
+  color: var(--encre-pale);
+}

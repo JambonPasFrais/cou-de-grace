@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Tests — Le cou de grâce</title>
+    <style>
+      body {
+        margin: 0 auto;
+        max-width: 60rem;
+        padding: 2rem 1rem 4rem;
+        font: 1rem/1.6 ui-monospace, SFMono-Regular, Menlo, monospace;
+        color: #1c1c1f;
+        background: #fafafa;
+      }
+      h1 {
+        font-size: 1.25rem;
+      }
+      h2 {
+        margin: 2rem 0 0.5rem;
+        font-size: 1rem;
+        color: #4a4a52;
+      }
+      ul {
+        margin: 0;
+        padding-left: 1.25rem;
+        list-style: none;
+      }
+      li {
+        padding: 0.15rem 0;
+      }
+      li.fail {
+        color: #b3261e;
+        font-weight: 700;
+      }
+      .summary {
+        position: sticky;
+        top: 0;
+        margin: 0;
+        padding: 0.75rem 1rem;
+        border-radius: 0.5rem;
+        font-weight: 700;
+      }
+      .summary.pass {
+        color: #0b6b3a;
+        background: #d9f2e4;
+      }
+      .summary.fail {
+        color: #b3261e;
+        background: #fbdcda;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Tests — Le cou de grâce</h1>
+    <div id="results">Exécution…</div>
+
+    <script type="module">
+      import { run } from './runner.js';
+      import './suites.js';
+
+      run(document.querySelector('#results'));
+    </script>
+  </body>
+</html>

@@ -1,0 +1,35 @@
+.apropos {
+  width: min(40rem, 100%);
+  margin: 0 auto;
+  padding: 1.5rem 1.5rem 3rem;
+}
+
+.apropos__contenu {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  margin-top: 2rem;
+  line-height: 1.5;
+}
+
+.apropos__section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.apropos__section h2 {
+  margin: 0;
+  font-family: var(--police-titre);
+  font-size: 1.375rem;
+}
+
+.apropos__liens,
+.apropos__sources {
+  margin: 0;
+  padding-left: 1.25rem;
+}
+
+.apropos__retour {
+  align-self: flex-start;
+}

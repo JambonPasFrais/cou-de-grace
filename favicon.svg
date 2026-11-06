@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <style>
+    .fond { fill: #f6efe8; }
+    .goutte { fill: #b3121f; }
+    .morsure { fill: #fffaf5; }
+    @media (prefers-color-scheme: dark) {
+      .fond { fill: #14090c; }
+      .goutte { fill: #c21d2b; }
+      .morsure { fill: #22121a; }
+    }
+  </style>
+  <rect class="fond" width="64" height="64" rx="14" />
+  <path class="goutte" d="M32 8 C32 8 15 28 15 40 a17 17 0 0 0 34 0 C49 28 32 8 32 8 Z" />
+  <circle class="morsure" cx="31" cy="39" r="2.2" />
+  <circle class="morsure" cx="38" cy="39" r="2.2" />
+</svg>

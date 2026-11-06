@@ -1,0 +1,12 @@
+Licence de la banque de blagues
+
+La banque de blagues du site (src/data/jokes.js) est placée sous licence
+Creative Commons Attribution 4.0 International (CC BY 4.0).
+
+Texte juridique complet : https://creativecommons.org/licenses/by/4.0/legalcode.fr
+
+Attribution attendue : « Le cou de grâce — https://github.com/JambonPasFrais/cou-de-grace »
+
+La source d'origine de chaque blague est créditée dans son champ source.
+
+Le reste du dépôt (code, styles, outils) est sous licence MIT : voir le fichier LICENSE.

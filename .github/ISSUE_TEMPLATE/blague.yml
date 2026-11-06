@@ -1,0 +1,51 @@
+name: Proposer une blague
+description: Proposez une blague de vampire pour la banque du Cou de grâce.
+title: "[Blague] "
+labels: ["blague"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Merci de votre contribution. Chaque blague est relue par le mainteneur avant d'être ajoutée.
+  - type: textarea
+    id: amorce
+    attributes:
+      label: Amorce
+      description: La mise en place de la blague, une réplique par ligne.
+      placeholder: |
+        Une chauve-souris vampire rentre à la grotte, le museau couvert de sang.
+        — Où est-ce que t'as trouvé tout ce sang ?!
+    validations:
+      required: true
+  - type: textarea
+    id: chute
+    attributes:
+      label: Chute
+      description: La réplique qui fait mouche.
+      placeholder: "— Eh ben moi, je l'avais pas vu."
+    validations:
+      required: true
+  - type: dropdown
+    id: registre
+    attributes:
+      label: Registre
+      options:
+        - Tout public
+        - Trash (vulgaire, scatologique, grivois, gore)
+    validations:
+      required: true
+  - type: input
+    id: source
+    attributes:
+      label: Source
+      description: Le nom et le lien de la source, ou « Création originale » si vous l'avez inventée.
+      placeholder: "Phortail, https://phortail.org/blagues/animaux-0921.html"
+    validations:
+      required: true
+  - type: checkboxes
+    id: charte
+    attributes:
+      label: Charte
+      options:
+        - label: Cette blague parle de vampires, en français, avec une chute. Elle ne vise aucun groupe de personnes (origine, religion, genre, orientation, handicap) et je l'ai réécrite avec mes mots.
+          required: true

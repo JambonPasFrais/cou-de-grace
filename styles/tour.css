@@ -1,0 +1,119 @@
+.tour {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  max-width: none;
+  height: 100%;
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--encre);
+  overflow: hidden;
+}
+
+.tour::backdrop {
+  background: transparent;
+}
+
+.tour__voile {
+  position: fixed;
+  border-radius: 6px;
+  outline: 2px solid var(--or);
+  box-shadow: 0 0 0 100vmax var(--voile);
+  pointer-events: none;
+  transition: left 200ms, top 200ms, width 200ms, height 200ms;
+}
+
+.tour__bulle {
+  position: fixed;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  width: min(22rem, calc(100% - 2rem));
+  padding: 1rem 1.25rem;
+  border: 1px solid var(--filet);
+  border-radius: 4px;
+  background: var(--velours);
+  line-height: 1.45;
+}
+
+.tour__compteur {
+  color: var(--encre-pale);
+  font-size: 0.875rem;
+  font-variant-numeric: tabular-nums lining-nums;
+}
+
+.tour__titre {
+  margin: 0;
+  font-family: var(--police-titre);
+  font-size: 1.375rem;
+}
+
+.tour__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 0.75rem;
+  margin-top: 0.5rem;
+}
+
+.tour__actions .tour__suivant {
+  height: 2.5rem;
+  margin-left: auto;
+  padding: 0 1.25rem;
+  font-size: 1rem;
+}
+
+.tour__pied {
+  margin-top: 0.25rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid var(--filet);
+  font-size: 0.875rem;
+}
+
+.tour__fleche {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  border: 1px solid var(--filet);
+  background: var(--velours);
+  transform: rotate(45deg);
+}
+
+.tour__bulle[data-side='below'] .tour__fleche {
+  top: -7px;
+  border-right: 0;
+  border-bottom: 0;
+}
+
+.tour__bulle[data-side='above'] .tour__fleche {
+  bottom: -7px;
+  border-top: 0;
+  border-left: 0;
+}
+
+.tour__bulle[data-side='left'] .tour__fleche {
+  right: -7px;
+  border-bottom: 0;
+  border-left: 0;
+}
+
+.tour__bulle[data-side='right'] .tour__fleche {
+  left: -7px;
+  border-top: 0;
+  border-right: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tour__voile {
+    transition: none;
+  }
+}
+
+@media (max-width: 899px) {
+  .tour__bulle {
+    width: calc(100% - 2rem);
+  }
+}

@@ -1,0 +1,5 @@
+- [ ] Le format de la blague respecte SPEC.md §2 (id, setup, punchline, trash, source).
+- [ ] `node tests/run.mjs` est vert.
+- [ ] Aucun identifiant existant n'a été renommé ni réutilisé.
+- [ ] La source est citée.
+- [ ] La charte est respectée : blague de vampire en français avec une chute, qui ne vise aucun groupe de personnes, réécrite avec mes mots.
