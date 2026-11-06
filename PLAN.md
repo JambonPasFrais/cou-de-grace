@@ -19,6 +19,7 @@ validée le 05/11/2026.
 | 7 | faite le 05/11/2026, commit `e58c62c` : smoke vert (trois révélations à la barre d'espace, aucune redite après rechargement) ; vide entre la carte et le bouton corrigé à l'étape 8 |
 | 8 | faite le 05/11/2026, commit `07b48e7` : smoke de 29 contrôles verts (épuisement, ligne trash, transfusion qui laisse `geotrain:v1` intact, À propos, longue blague sans défilement à 1280 × 720, sans animation) ; bandeau de stockage non vérifié en rendu |
 | 11 | contrôle du verifier le 05/11/2026 : 1 bloquant (Entrée sur l'épuisement transfusait sans confirmation), 1 important (`aria-live` recréé à chaque rendu) et 10 mineurs. Tous corrigés (commits `b1d2d00` et `53097f5`), smoke de 37 contrôles verts |
+| 12 | lancée le 06/11/2026 |
 | 10 | PR #1 ouverte le 05/11/2026, Action verte. Site publié le 05/11/2026 sur GitHub Pages depuis `feature/v1` (https://jambonpasfrais.github.io/cou-de-grace/) : smoke en ligne de 37 contrôles verts, après le correctif du focus après transfusion (`948ed30`). Restent les scénarios manuels d'Armand, puis la bascule de Pages sur `main` après la fusion |
 
 ## Branches, commits, push
@@ -60,6 +61,8 @@ code.
 | 9 | **Contribution sur GitHub** : `.github/ISSUE_TEMPLATE/blague.yml` (amorce, chute, trash, source), `.github/pull_request_template.md`, `.github/workflows/tests.yml` (Node 22, `node tests/run.mjs` sur chaque PR) | [S] implementer | 1 | `node tests/run.mjs` vert ; le formulaire et l'Action se contrôlent sur GitHub après le premier push (étape 10) |
 | 10 | **Assemblage et essais** : les 5 scénarios manuels de SPEC §11, sur ordinateur et téléphone ; l'Action passe au vert sur la PR de `feature/v1` | [F] session + Armand | 4, 8, 9 | scénarios cochés par Armand |
 | 11 | **Contrôle final** contre SPEC.md et DA.md : relit le diff, relance les tests et le smoke, compare les captures | verifier | 10 | rapport sans écart bloquant |
+| 12 | **Tutoriel en visite guidée** (SPEC §3 « Le tutoriel », §5, §11 point 7 ; DA §2 `--voile`, §5, §6, §7, §9), ajouté le 06/11/2026 pour la v1 : champ `tutorial` dans le stockage, transfusion qui le garde, module `src/ui/tour.js`, lien « Revoir le tutoriel », texte « Vos données » d'À propos | [S] implementer | 11 | tests du stockage verts ; smoke étendu au tutoriel ; captures des 4 étapes à 1440 et 390 px |
+| 13 | **Contrôle du tutoriel** contre SPEC et DA | verifier | 12 | rapport sans écart bloquant ; push sur `feature/v1` ensuite (accord d'Armand du 06/11/2026) |
 
 ## Parallélisme
 

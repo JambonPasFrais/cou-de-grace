@@ -103,6 +103,31 @@ remplace la blague :
 - Les blagues ajoutées à la banque après l'épuisement deviennent disponibles
   dès la visite suivante, sans rien faire.
 
+### Le tutoriel (visite guidée)
+
+À l'arrivée sur `#/`, une visite guidée de 4 étapes explique l'écran. Chaque
+étape est une bulle pointée sur l'élément qu'elle décrit, le reste de la page
+étant voilé :
+
+| Étape | Élément désigné | Ce qu'elle explique |
+|---|---|---|
+| 1 / 4 | la carte et le bouton principal | lire l'amorce, « Achever » ou Espace pour la chute, « Victime suivante » |
+| 2 / 4 | la poche de sang (la jauge horizontale sur téléphone) | elle compte les blagues pas encore vues et se vide à chaque chute ; aucune blague déjà vue ne revient |
+| 3 / 4 | l'interrupteur trash | coupé par défaut ; il ajoute les blagues vulgaires |
+| 4 / 4 | « Transfusion », dans le pied de page | elle remplit la poche vide, et toutes les blagues peuvent revenir |
+
+- **Quand** : à chaque chargement de la page tant que le tutoriel n'a pas été
+  désactivé. Une seule fois par chargement : revenir de `#/a-propos` ne le
+  relance pas. Il n'apparaît pas sur l'écran d'épuisement.
+- **Désactiver** : seul le bouton « Ne plus afficher », présent à chaque étape,
+  le désactive. « Passer », ou « C'est parti » à la dernière étape, le ferment
+  pour ce chargement seulement.
+- **Revoir** : le lien « Revoir le tutoriel » du pied de page le relance à tout
+  moment, sans changer le choix enregistré.
+- **Pendant la visite**, la barre d'espace et Entrée ne révèlent aucune chute,
+  et rien n'est compté comme vu. Échap équivaut à « Passer », → et Entrée à
+  « Suivant », ← à « Précédent ».
+
 ## 4. L'interrupteur « blagues trash »
 
 - Il est **désactivé par défaut**. Son libellé prévient du registre (humour
@@ -119,13 +144,16 @@ strict minimum.
 - **Origine partagée** : geo-train et pkmon-training sont servis eux aussi
   depuis `jambonpasfrais.github.io`. Il n'y a donc qu'**une seule clé**,
   `coudegrace:v1`, et `localStorage.clear()` est interdit.
-- **Contenu** : les identifiants des blagues vues et l'état de l'interrupteur.
-  Rien d'autre : ni date, ni ordre de passage, ni texte de blague, ni compteur
-  (il se calcule).
+- **Contenu** : les identifiants des blagues vues, l'état de l'interrupteur
+  et le choix de ne plus afficher le tutoriel. Rien d'autre : ni date, ni ordre
+  de passage, ni texte de blague, ni compteur (il se calcule).
 
   ```json
-  { "v": 1, "seen": ["chauve-souris", "franck"], "trash": false }
+  { "v": 1, "seen": ["chauve-souris", "franck"], "trash": false, "tutorial": true }
   ```
+
+  Une clé écrite avant l'ajout du tutoriel, sans le champ `tutorial`, se lit
+  comme `tutorial: true` : la version reste `1`.
 
 - **Taille bornée** : au chargement, les identifiants qui ne sont plus dans la
   banque sont retirés. La clé ne dépasse donc jamais la taille de la banque :
@@ -133,11 +161,14 @@ strict minimum.
 - **Peu d'accès** : la clé est lue une fois au démarrage. Elle n'est écrite que
   lorsque quelque chose change : une chute révélée, l'interrupteur, une
   transfusion.
-- **État par défaut** (aucune blague vue, interrupteur coupé) : la clé est
-  supprimée plutôt qu'écrite.
+- **État par défaut** (aucune blague vue, interrupteur coupé, tutoriel
+  affiché) : la clé est supprimée plutôt qu'écrite.
 - **Transfusion** : le bouton est toujours accessible en pied de page, et aussi
-  sur l'écran d'épuisement. Après confirmation, il fait
-  `localStorage.removeItem("coudegrace:v1")`. Seule cette clé disparaît :
+  sur l'écran d'épuisement. Après confirmation, il vide les blagues vues et
+  coupe l'interrupteur, mais **garde le choix du tutoriel** : la transfusion
+  remet les blagues à zéro, pas l'apprentissage. Si le tutoriel n'a pas été
+  désactivé, l'état revient à l'état par défaut et la clé est supprimée
+  (`localStorage.removeItem("coudegrace:v1")`). Seule cette clé est touchée :
   geo-train et pkmon-training gardent leur progression.
 - **Données illisibles** (JSON invalide, version inconnue) : le site démarre
   avec un état vide, sans planter.
@@ -151,7 +182,7 @@ strict minimum.
 
 | Route | Contenu |
 |---|---|
-| `#/` | la blague en cours, ou l'écran d'épuisement ; la jauge ; l'interrupteur ; en pied de page « Transfusion », « Proposer une blague », « À propos » |
+| `#/` | la blague en cours, ou l'écran d'épuisement ; la jauge ; l'interrupteur ; le tutoriel à l'arrivée ; en pied de page « Transfusion », « Proposer une blague », « Revoir le tutoriel », « À propos » |
 | `#/a-propos` | le pitch, comment contribuer, les licences, les sources créditées |
 
 - La conception part de l'ordinateur (1280 à 1920 px de large). Le site reste
@@ -249,7 +280,20 @@ Action. Les tests couvrent :
    - l'état par défaut supprime la clé ;
    - toute clé écrite commence par `coudegrace:` ;
    - la transfusion laisse intactes les clés `geotrain:` et pkmon d'un stockage
-     factice.
+     factice ;
+   - une clé sans champ `tutorial` se lit avec le tutoriel affiché ;
+   - la transfusion garde `tutorial: false`, et l'état par défaut, tutoriel
+     affiché, supprime toujours la clé.
+7. **Tutoriel** (parcours sous Chrome) :
+   - au premier chargement, l'étape 1 / 4 s'affiche, et la barre d'espace ne
+     révèle aucune chute ;
+   - « Suivant » mène aux 4 étapes, chacune pointée sur son élément, à 1440 et
+     390 px ;
+   - « C'est parti » ferme sans désactiver : le tutoriel revient au
+     rechargement ;
+   - « Ne plus afficher » le désactive : il ne revient ni au rechargement, ni
+     après une transfusion ;
+   - « Revoir le tutoriel » le relance.
 
 **Manuels**, sur ordinateur (1440 px) et sur téléphone (390 px) :
 
@@ -260,6 +304,8 @@ Action. Les tests couvrent :
    n'a rien perdu.
 4. Le lien « Proposer une blague » ouvre le formulaire GitHub.
 5. En navigation privée, le site fonctionne et affiche le bandeau.
+6. À la première visite, le tutoriel suffit à comprendre à quoi servent la
+   poche, l'interrupteur et la transfusion.
 
 ## 12. Décisions
 
@@ -275,6 +321,13 @@ Action. Les tests couvrent :
 - le code sous MIT et les blagues sous CC BY 4.0 ;
 - un bouton qui remet la session à zéro et vide le stockage du site ;
 - un stockage minimal, avec des identifiants courts.
+
+**Prises par Armand le 06/11/2026**, pour la v1 :
+
+- un tutoriel en visite guidée de 4 étapes, qui revient à chaque visite
+  jusqu'à « Ne plus afficher » ;
+- la transfusion garde le tutoriel désactivé ;
+- le push sur `feature/v1` dès que c'est vérifié.
 
 **Proposées, à valider** :
 
