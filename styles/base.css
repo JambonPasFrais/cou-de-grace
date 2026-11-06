@@ -11,6 +11,7 @@
   --sang-ink: light-dark(#fffaf5, #14090c);
   --poche: light-dark(#b3121f, #c21d2b);
   --or: light-dark(#8a6416, #e3b55b);
+  --voile: light-dark(rgb(20 9 12 / 0.55), rgb(0 0 0 / 0.65));
 
   --police-titre: 'Bodoni 72', Didot, 'Bodoni MT', 'Iowan Old Style', Georgia, serif;
   --police-texte: 'Iowan Old Style', 'Palatino Linotype', Palatino, 'Book Antiqua', Georgia, ui-serif, serif;

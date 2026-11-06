@@ -50,7 +50,7 @@ export function aboutScreen() {
         text(
           'p',
           frenchSpacing(
-            'Le site garde seulement la liste des blagues que vous avez vues et l\'état de l\'interrupteur, dans votre navigateur. Rien n\'est envoyé nulle part. La transfusion efface tout.',
+            'Le site garde seulement la liste des blagues que vous avez vues, l\'état de l\'interrupteur et votre choix sur le tutoriel, dans votre navigateur. Rien n\'est envoyé nulle part. La transfusion remet la réserve à plein.',
           ),
         ),
       ]),

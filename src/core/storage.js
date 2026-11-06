@@ -22,14 +22,14 @@ export function parseState(raw, knownIds) {
       seen.push(id);
     }
   }
-  return { seen, trash: data.trash === true };
+  return { seen, trash: data.trash === true, tutorial: data.tutorial !== false };
 }
 
 export function serializeState(state) {
-  if (state.seen.length === 0 && state.trash !== true) {
+  if (state.seen.length === 0 && state.trash !== true && state.tutorial !== false) {
     return null;
   }
-  return JSON.stringify({ v: 1, seen: state.seen, trash: state.trash });
+  return JSON.stringify({ v: 1, seen: state.seen, trash: state.trash, tutorial: state.tutorial !== false });
 }
 
 export function readState(storage, knownIds) {

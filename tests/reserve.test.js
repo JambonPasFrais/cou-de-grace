@@ -6,6 +6,7 @@ import {
   gauge,
   trashLeft,
   setTrash,
+  setTutorial,
   transfuse,
 } from '../src/core/reserve.js';
 
@@ -86,10 +87,17 @@ describe('réserve : interrupteur', () => {
   });
 
   test('setTrash change seulement trash, sans mutation', () => {
-    const state = { seen: ['a'], trash: false };
+    const state = { seen: ['a'], trash: false, tutorial: false };
     const next = setTrash(state, true);
-    assertDeepEqual(next, { seen: ['a'], trash: true });
-    assertDeepEqual(state, { seen: ['a'], trash: false });
+    assertDeepEqual(next, { seen: ['a'], trash: true, tutorial: false });
+    assertDeepEqual(state, { seen: ['a'], trash: false, tutorial: false });
+  });
+
+  test('setTutorial change seulement tutorial, sans mutation', () => {
+    const state = { seen: ['a'], trash: true, tutorial: true };
+    const next = setTutorial(state, false);
+    assertDeepEqual(next, { seen: ['a'], trash: true, tutorial: false });
+    assertDeepEqual(state, { seen: ['a'], trash: true, tutorial: true });
   });
 });
 
@@ -113,8 +121,25 @@ describe('réserve : vue', () => {
     assertDeepEqual(gauge(bank, twice.seen), { left: 4, total: 5 });
   });
 
-  test('transfuse rend l’état par défaut', () => {
-    assertDeepEqual(transfuse(), { seen: [], trash: false });
+  test('reveal garde le choix du tutoriel', () => {
+    const state = { seen: [], trash: false, tutorial: false };
+    assertEqual(reveal(state, 'c1').tutorial, false);
+    assertEqual(reveal(reveal(state, 'c1'), 'c1').tutorial, false);
+  });
+
+  test('l’état par défaut affiche le tutoriel', () => {
+    assertDeepEqual(defaultState(), { seen: [], trash: false, tutorial: true });
+  });
+
+  test('transfuse rend l’état par défaut quand le tutoriel est affiché', () => {
+    const state = { seen: ['c1'], trash: true, tutorial: true };
+    assertDeepEqual(transfuse(state), defaultState());
+  });
+
+  test('transfuse garde tutorial: false', () => {
+    const state = { seen: ['c1'], trash: true, tutorial: false };
+    assertDeepEqual(transfuse(state), { seen: [], trash: false, tutorial: false });
+    assertDeepEqual(state, { seen: ['c1'], trash: true, tutorial: false });
   });
 });
 

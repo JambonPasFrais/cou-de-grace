@@ -12,6 +12,9 @@ const SCREENSHOT = '/tmp/cou-de-grace/smoke-revealed.png';
 const OUTPUT = '/tmp/cou-de-grace';
 const FOREIGN_KEY = 'geotrain:v1';
 const PROBE_KEY = 'coudegrace:test';
+const TUTORIAL_OFF = '{"v":1,"seen":[],"trash":false,"tutorial":false}';
+const TOUR_TITLES = ['Achevez vos collègues', 'La réserve de sang', "Âmes sensibles s'abstenir", 'La transfusion'];
+const TOUR_OPEN = "document.querySelector('dialog.tour')?.open === true";
 const MAX_PRESSES = 2 * 44 + 5;
 const plain = value => value.replace(/[\u00a0\u202f]/g, ' ');
 
@@ -115,6 +118,13 @@ async function launch() {
     await cdp.send('Input.dispatchKeyEvent', { type: 'keyUp', ...key });
   };
 
+  const pressArrow = async name => {
+    const codes = { ArrowLeft: 37, ArrowRight: 39 };
+    const key = { key: name, code: name, windowsVirtualKeyCode: codes[name], nativeVirtualKeyCode: codes[name] };
+    await cdp.send('Input.dispatchKeyEvent', { type: 'keyDown', ...key });
+    await cdp.send('Input.dispatchKeyEvent', { type: 'keyUp', ...key });
+  };
+
   const close = async () => {
     cdp.close();
     const exited = new Promise(resolve => chrome.once('exit', resolve));
@@ -123,11 +133,41 @@ async function launch() {
     await rm(profile, { recursive: true, force: true, maxRetries: 10, retryDelay: 100 });
   };
 
-  return { cdp, evaluate, waitFor, navigate, pressSpace, pressEnter, close };
+  return { cdp, evaluate, waitFor, navigate, pressSpace, pressEnter, pressArrow, close };
 }
 
 const cardState = state => `document.querySelector('.carte')?.dataset.state === ${JSON.stringify(state)}`;
 const cardId = browser => browser.evaluate("document.querySelector('.carte')?.dataset.jokeId ?? null");
+
+const geometryExpression = step => `(() => {
+  const rect = element => element.getBoundingClientRect();
+  const actions = document.querySelector('.actions');
+  const pinned = getComputedStyle(actions).position === 'fixed';
+  const elements = [
+    [document.querySelector('.carte'), ...(pinned ? [] : [actions])],
+    [document.querySelector('.jauge')],
+    [document.querySelector('.interrupteur')],
+    [document.querySelector('[data-testid="transfusion-footer"]')],
+  ][${step}];
+  const rects = elements.map(rect);
+  const target = {
+    left: Math.min(...rects.map(r => r.left)),
+    top: Math.min(...rects.map(r => r.top)),
+    right: Math.max(...rects.map(r => r.right)),
+    bottom: Math.max(...rects.map(r => r.bottom)),
+  };
+  const veil = rect(document.querySelector('.tour__voile'));
+  const bubble = rect(document.querySelector('.tour__bulle'));
+  const covers =
+    veil.left <= target.left + 0.5 && veil.top <= target.top + 0.5 &&
+    veil.right >= target.right - 0.5 && veil.bottom >= target.bottom - 0.5;
+  const apart =
+    bubble.right <= target.left + 0.5 || bubble.left >= target.right - 0.5 ||
+    bubble.bottom <= target.top + 0.5 || bubble.top >= target.bottom - 0.5;
+  const inside = bubble.left >= 0 && bubble.top >= 0 && bubble.right <= innerWidth && bubble.bottom <= innerHeight;
+  const aboveButton = !pinned || bubble.bottom <= rect(actions).top + 0.5;
+  return { covers, apart, inside, aboveButton, side: document.querySelector('.tour__bulle').dataset.side };
+})()`;
 
 async function main(base) {
   const browser = await launch();
@@ -164,13 +204,111 @@ async function main(base) {
   const click = selector => browser.evaluate(`document.querySelector(${JSON.stringify(selector)}).click()`);
   const text = selector => browser.evaluate(`document.querySelector(${JSON.stringify(selector)})?.textContent ?? null`);
 
+  const tourButton = label =>
+    browser.evaluate(
+      `[...document.querySelectorAll('dialog.tour button')].find(b => b.textContent.replace(/[\\u00a0\\u202f]/g, ' ') === ${JSON.stringify(label)}).click()`,
+    );
+  const tourClosed = async () => {
+    await browser.waitFor(`!(${TOUR_OPEN})`);
+    await browser.waitFor("document.activeElement?.dataset.testid === 'primary'");
+  };
+  const reloadWithTour = async label => {
+    await browser.navigate(base);
+    await browser.waitFor(TOUR_OPEN);
+    report(true, label, 'visite ouverte');
+  };
+  const walkTour = async width => {
+    for (let step = 0; step < 4; step += 1) {
+      await browser.waitFor(`document.querySelector('.tour__compteur')?.textContent === '${step + 1} / 4'`);
+      const title = plain((await text('.tour__titre')) ?? '');
+      let geometry = null;
+      for (let attempt = 0; attempt < 60; attempt += 1) {
+        geometry = await browser.evaluate(geometryExpression(step));
+        if (geometry.covers) break;
+        await sleep(50);
+      }
+      report(
+        title === plain(TOUR_TITLES[step]) && geometry.covers,
+        `étape ${step + 1} / 4 à ${width} px`,
+        `« ${title} » · voile sur la cible = ${geometry.covers}`,
+      );
+      report(
+        geometry.apart && geometry.inside && geometry.aboveButton,
+        `bulle de l'étape ${step + 1} à ${width} px`,
+        `côté ${geometry.side} · hors de la cible = ${geometry.apart} · dans l'écran = ${geometry.inside} · au-dessus du bouton collé = ${geometry.aboveButton}`,
+      );
+      await capture(`tuto-${step + 1}-${width}`);
+      if (step < 3) await tourButton('Suivant');
+    }
+  };
+
   try {
     await mkdir(OUTPUT, { recursive: true });
     await browser.navigate(base);
     await browser.evaluate(`localStorage.removeItem(${JSON.stringify(STORAGE_KEY)})`);
     await browser.evaluate(`localStorage.setItem(${JSON.stringify(FOREIGN_KEY)}, '{"x":1}')`);
     await browser.navigate(base);
+    await browser.waitFor(TOUR_OPEN);
+    await browser.waitFor("document.querySelector('.tour__compteur')?.textContent === '1 / 4'");
+    report(true, 'premier chargement : étape 1 / 4 ouverte', 'visite ouverte');
+    const focused = plain(await browser.evaluate('document.activeElement?.textContent ?? null'));
+    report(focused === 'Suivant', 'focus sur Suivant', `« ${focused} »`);
+    await browser.pressSpace();
+    await sleep(200);
+    report(
+      (await browser.evaluate(cardState('setup'))) && (await stored(STORAGE_KEY)) === null,
+      'espace pendant la visite : rien révélé, clé absente',
+      `carte setup · clé ${await stored(STORAGE_KEY)}`,
+    );
+    for (let press = 0; press < 3; press += 1) await browser.pressArrow('ArrowLeft');
+    await browser.waitFor("document.querySelector('.tour__compteur')?.textContent === '1 / 4'");
+    await browser.pressArrow('ArrowRight');
+    await browser.waitFor("document.querySelector('.tour__compteur')?.textContent === '2 / 4'");
+    await browser.pressArrow('ArrowLeft');
+    await browser.waitFor("document.querySelector('.tour__compteur')?.textContent === '1 / 4'");
+    report(true, 'flèches : → suivant, ← précédent', '2 / 4 puis 1 / 4');
+
+    await media(false, false);
+    await walkTour(1440);
+    await tourButton("C'est parti");
+    await tourClosed();
+    const focusAfter = await browser.evaluate("document.activeElement?.dataset.testid ?? null");
+    report(
+      (await stored(STORAGE_KEY)) === null && focusAfter === 'primary',
+      "C'est parti ferme sans rien écrire",
+      `clé ${await stored(STORAGE_KEY)} · focus ${focusAfter}`,
+    );
+    await reloadWithTour('rechargement : la visite revient');
+
+    await viewport(390, 844, true);
+    await media(true, false);
+    await browser.navigate(base);
+    await browser.waitFor(TOUR_OPEN);
+    await walkTour(390);
+    await tourButton('Passer');
+    await tourClosed();
+    report((await stored(STORAGE_KEY)) === null, 'Passer ferme sans rien écrire', String(await stored(STORAGE_KEY)));
+    await viewport(1440, 900);
+    await media(false, false);
+
+    await reloadWithTour('rechargement avant « Ne plus afficher »');
+    await tourButton('Ne plus afficher');
+    await tourClosed();
+    report((await stored(STORAGE_KEY)) === TUTORIAL_OFF, 'Ne plus afficher', String(await stored(STORAGE_KEY)));
+    await browser.navigate(base);
     await browser.waitFor(cardState('setup'));
+    await sleep(500);
+    report(!(await browser.evaluate(TOUR_OPEN)), 'rechargement : la visite ne revient pas', 'visite fermée');
+
+    await click('[data-testid="tour-replay"]');
+    await browser.waitFor(TOUR_OPEN);
+    await tourButton('Passer');
+    await tourClosed();
+    report(
+      (await stored(STORAGE_KEY)) === TUTORIAL_OFF,
+      'Revoir le tutoriel rouvre la visite, sans écrire',
+      String(await stored(STORAGE_KEY)),
+    );
 
     const revealed = [];
     for (let round = 0; round < 3; round += 1) {
@@ -281,7 +419,8 @@ async function main(base) {
     await browser.waitFor(cardState('setup'));
     const meter = await browser.evaluate("document.querySelector('[role=\"meter\"]').getAttribute('aria-valuenow')");
     report(meter === '40', 'jauge après transfusion', `aria-valuenow = ${meter}`);
-    report((await stored(STORAGE_KEY)) === null, 'clé coudegrace:v1 absente', String(await stored(STORAGE_KEY)));
+    const afterTransfusion = await stored(STORAGE_KEY);
+    report(afterTransfusion === TUTORIAL_OFF, 'clé coudegrace:v1 après transfusion', String(afterTransfusion));
     report((await stored(FOREIGN_KEY)) === '{"x":1}', 'clé geotrain:v1 intacte', String(await stored(FOREIGN_KEY)));
     report((await stored(PROBE_KEY)) === null, 'aucune clé coudegrace:test', String(await stored(PROBE_KEY)));
     await exhaust();
@@ -291,6 +430,12 @@ async function main(base) {
       'message d\'épuisement différent du précédent',
       `« ${messageBefore} » puis « ${messageAfter} »`,
     );
+
+    await browser.evaluate(`localStorage.setItem(${JSON.stringify(STORAGE_KEY)}, ${JSON.stringify(afterTransfusion)})`);
+    await browser.navigate(base);
+    await browser.waitFor(cardState('setup'));
+    await sleep(500);
+    report(!(await browser.evaluate(TOUR_OPEN)), 'après transfusion et rechargement : la visite ne revient pas', 'visite fermée');
 
     await browser.evaluate("location.hash = '#/a-propos'");
     await browser.waitFor("document.querySelector('.apropos') !== null");
@@ -315,7 +460,7 @@ async function main(base) {
     const others = JOKES.filter(joke => !joke.trash && joke.id !== longest.id).map(joke => joke.id);
     await browser.evaluate("location.hash = '#/'");
     await browser.evaluate(
-      `localStorage.setItem(${JSON.stringify(STORAGE_KEY)}, ${JSON.stringify(JSON.stringify({ v: 1, seen: others, trash: false }))})`,
+      `localStorage.setItem(${JSON.stringify(STORAGE_KEY)}, ${JSON.stringify(JSON.stringify({ v: 1, seen: others, trash: false, tutorial: false }))})`,
     );
     await viewport(1280, 720);
     await browser.navigate(base);
@@ -335,7 +480,7 @@ async function main(base) {
     await capture('principal-revele-390');
     await viewport(1440, 900);
 
-    await browser.evaluate(`localStorage.removeItem(${JSON.stringify(STORAGE_KEY)})`);
+    await browser.evaluate(`localStorage.setItem(${JSON.stringify(STORAGE_KEY)}, ${JSON.stringify(TUTORIAL_OFF)})`);
     await browser.navigate(base);
     await browser.waitFor(cardState('setup'));
     await media(false, true);

@@ -111,7 +111,7 @@ remplace la blague :
 
 | Étape | Élément désigné | Ce qu'elle explique |
 |---|---|---|
-| 1 / 4 | la carte et le bouton principal | lire l'amorce, « Achever » ou Espace pour la chute, « Victime suivante » |
+| 1 / 4 | la carte et le bouton principal (la carte seule sous 900 px, où le bouton collé en bas ne laisse pas de place à la bulle) | lire l'amorce, « Achever » ou Espace pour la chute, « Victime suivante » |
 | 2 / 4 | la poche de sang (la jauge horizontale sur téléphone) | elle compte les blagues pas encore vues et se vide à chaque chute ; aucune blague déjà vue ne revient |
 | 3 / 4 | l'interrupteur trash | coupé par défaut ; il ajoute les blagues vulgaires |
 | 4 / 4 | « Transfusion », dans le pied de page | elle remplit la poche vide, et toutes les blagues peuvent revenir |
@@ -125,7 +125,8 @@ remplace la blague :
 - **Revoir** : le lien « Revoir le tutoriel » du pied de page le relance à tout
   moment, sans changer le choix enregistré.
 - **Pendant la visite**, la barre d'espace et Entrée ne révèlent aucune chute,
-  et rien n'est compté comme vu. Échap équivaut à « Passer », → et Entrée à
+  et rien n'est compté comme vu : elles activent le bouton de la bulle qui a le
+  focus, « Suivant » au départ. Échap équivaut à « Passer », → et Entrée à
   « Suivant », ← à « Précédent ».
 
 ## 4. L'interrupteur « blagues trash »

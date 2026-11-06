@@ -1,5 +1,5 @@
 export function defaultState() {
-  return { seen: [], trash: false };
+  return { seen: [], trash: false, tutorial: true };
 }
 
 export function drawJoke(allowed, seen, rng) {
@@ -14,9 +14,9 @@ export function drawJoke(allowed, seen, rng) {
 
 export function reveal(state, id) {
   if (state.seen.includes(id)) {
-    return { seen: [...state.seen], trash: state.trash };
+    return { seen: [...state.seen], trash: state.trash, tutorial: state.tutorial };
   }
-  return { seen: [...state.seen, id], trash: state.trash };
+  return { seen: [...state.seen, id], trash: state.trash, tutorial: state.tutorial };
 }
 
 export function gauge(allowed, seen) {
@@ -31,9 +31,13 @@ export function trashLeft(bank, seen) {
 }
 
 export function setTrash(state, on) {
-  return { seen: [...state.seen], trash: on };
+  return { seen: [...state.seen], trash: on, tutorial: state.tutorial };
 }
 
-export function transfuse() {
-  return defaultState();
+export function setTutorial(state, on) {
+  return { seen: [...state.seen], trash: state.trash, tutorial: on };
+}
+
+export function transfuse(state) {
+  return { seen: [], trash: false, tutorial: state.tutorial };
 }

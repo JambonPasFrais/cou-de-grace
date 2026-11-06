@@ -1,6 +1,6 @@
 import { allowedJokes } from '../../core/bank.js';
 import { EXHAUSTION_MESSAGES, pickExhaustion } from '../../core/exhaustion.js';
-import { drawJoke, gauge, reveal, setTrash, transfuse, trashLeft } from '../../core/reserve.js';
+import { drawJoke, gauge, reveal, setTrash, setTutorial, transfuse, trashLeft } from '../../core/reserve.js';
 import { frenchSpacing } from '../../core/typography.js';
 import { JOKES } from '../../data/jokes.js';
 import { button, div, el, text } from '../dom.js';
@@ -8,11 +8,13 @@ import { createEmptyPouch, createGauge } from '../gauge.js';
 import { createHeader } from '../header.js';
 import { getState, saveState } from '../persistence.js';
 import { svg } from '../svg.js';
+import { createTour } from '../tour.js';
 
 const CONTRIBUTE_URL = 'https://github.com/JambonPasFrais/cou-de-grace/issues/new?template=blague.yml';
 const IGNORED_TARGETS = 'button, a, input, textarea, select, [role="switch"]';
 const ORIGINAL_SOURCE = 'Création originale';
 let lastExhaustion = null;
+let tourLaunched = false;
 const TRASH_COUNT = JOKES.filter(joke => joke.trash).length;
 
 const prefersReducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -107,12 +109,17 @@ export function jokeScreen() {
     ],
   );
 
+  const transfusionButton = button(
+    { class: 'bouton-secondaire', 'data-testid': 'transfusion-footer', on: { click: () => openTransfusion() } },
+    [frenchSpacing('Transfusion')],
+  );
+
   const footer = el('footer', { class: 'pied' }, [
-    button(
-      { class: 'bouton-secondaire', 'data-testid': 'transfusion-footer', on: { click: () => openTransfusion() } },
-      [frenchSpacing('Transfusion')],
-    ),
+    transfusionButton,
     contributeLink(),
+    button({ class: 'bouton-lien', 'data-testid': 'tour-replay', on: { click: () => tour.open() } }, [
+      frenchSpacing('Revoir le tutoriel'),
+    ]),
     text('a', frenchSpacing('À propos'), { class: 'lien', href: '#/a-propos' }),
   ]);
 
@@ -133,6 +140,24 @@ export function jokeScreen() {
     ]),
   ]);
 
+  const actionsPinned = () => getComputedStyle(actions).position === 'fixed' && !actions.hidden;
+
+  const tour = createTour({
+    trashCount: TRASH_COUNT,
+    targets: () => [
+      () => (actionsPinned() ? [card] : [card, actions]),
+      () => [reserve.node],
+      () => [trashSwitch],
+      () => [transfusionButton],
+    ],
+    bottomInset: () => (actionsPinned() ? window.innerHeight - actions.getBoundingClientRect().top : 0),
+    onDisable: () => {
+      state = setTutorial(state, false);
+      saveState(state);
+    },
+    onClose: () => primary.focus(),
+  });
+
   const root = div({ class: 'joke' }, [
     div({ class: 'centre' }, [
       div({ class: 'bloc' }, [createHeader(), card, actions, switchSlot]),
@@ -140,6 +165,7 @@ export function jokeScreen() {
     ]),
     footer,
     dialog,
+    tour.node,
   ]);
 
   const live = div({ class: 'chute__live', 'aria-live': 'polite' });
@@ -265,7 +291,7 @@ export function jokeScreen() {
 
   function transfuseNow() {
     dialog.close();
-    state = transfuse();
+    state = transfuse(state);
     saveState(state);
     syncSwitch();
     draw();
@@ -290,7 +316,7 @@ export function jokeScreen() {
       document.removeEventListener('keydown', onKey);
       return;
     }
-    if (dialog.open) {
+    if (dialog.open || tour.isOpen()) {
       return;
     }
     const isSpace = event.key === ' ' || event.code === 'Space';
@@ -310,5 +336,16 @@ export function jokeScreen() {
   syncSwitch();
   draw();
   updateGauge();
+
+  if (!tourLaunched) {
+    tourLaunched = true;
+    if (state.tutorial && current !== null) {
+      requestAnimationFrame(() => {
+        if (root.isConnected) {
+          tour.open();
+        }
+      });
+    }
+  }
   return root;
 }
