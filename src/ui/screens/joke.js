@@ -155,7 +155,13 @@ export function jokeScreen() {
       state = setTutorial(state, false);
       saveState(state);
     },
-    onClose: () => primary.focus(),
+    onClose: () => {
+      if (!root.isConnected) {
+        return;
+      }
+      const target = actions.hidden ? card.querySelector('[data-testid="transfusion-card"]') : primary;
+      target?.focus();
+    },
   });
 
   const root = div({ class: 'joke' }, [

@@ -19,7 +19,8 @@ validée le 05/11/2026.
 | 7 | faite le 05/11/2026, commit `e58c62c` : smoke vert (trois révélations à la barre d'espace, aucune redite après rechargement) ; vide entre la carte et le bouton corrigé à l'étape 8 |
 | 8 | faite le 05/11/2026, commit `07b48e7` : smoke de 29 contrôles verts (épuisement, ligne trash, transfusion qui laisse `geotrain:v1` intact, À propos, longue blague sans défilement à 1280 × 720, sans animation) ; bandeau de stockage non vérifié en rendu |
 | 11 | contrôle du verifier le 05/11/2026 : 1 bloquant (Entrée sur l'épuisement transfusait sans confirmation), 1 important (`aria-live` recréé à chaque rendu) et 10 mineurs. Tous corrigés (commits `b1d2d00` et `53097f5`), smoke de 37 contrôles verts |
-| 12 | lancée le 06/11/2026 |
+| 12 | faite le 06/11/2026, commit `35ed1eb` : 67 tests, smoke étendu aux 4 étapes à 1440 et 390 px |
+| 13 | contrôle du verifier le 06/11/2026 : aucun bloquant, 1 important (focus rendu en retard à la fermeture d'une visite relancée) et 8 mineurs, corrigés ou notés dans la SPEC et la DA ; smoke de 74 contrôles verts |
 | 10 | PR #1 ouverte le 05/11/2026, Action verte. Site publié le 05/11/2026 sur GitHub Pages depuis `feature/v1` (https://jambonpasfrais.github.io/cou-de-grace/) : smoke en ligne de 37 contrôles verts, après le correctif du focus après transfusion (`948ed30`). Restent les scénarios manuels d'Armand, puis la bascule de Pages sur `main` après la fusion |
 
 ## Branches, commits, push

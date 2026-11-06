@@ -300,9 +300,12 @@ async function main(base) {
     await sleep(500);
     report(!(await browser.evaluate(TOUR_OPEN)), 'rechargement : la visite ne revient pas', 'visite fermée');
 
-    await click('[data-testid="tour-replay"]');
+    await browser.evaluate(`document.querySelector('[data-testid="tour-replay"]').focus()`);
+    await browser.pressEnter();
     await browser.waitFor(TOUR_OPEN);
     await tourButton('Passer');
+    const focusAfterReplay = await browser.evaluate('document.activeElement?.dataset.testid ?? document.activeElement?.tagName');
+    report(focusAfterReplay === 'primary', 'focus sur « Achever » dès la fermeture d\'une visite relancée', String(focusAfterReplay));
     await tourClosed();
     report(
       (await stored(STORAGE_KEY)) === TUTORIAL_OFF,

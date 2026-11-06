@@ -57,7 +57,7 @@ Autres règles :
 - Chemins **relatifs** partout : le site est servi sous `/cou-de-grace/`.
 - Textes d'interface en français, au **vouvoiement** (DA §7).
 - Stockage : une seule clé, `coudegrace:v1`, qui ne contient que les
-  identifiants vus et l'interrupteur. Elle est purgée au chargement et supprimée
+  identifiants vus, l'interrupteur et le choix du tutoriel (`tutorial`). Elle est purgée au chargement et supprimée
   quand elle revient à l'état par défaut. `localStorage.clear()` est interdit :
   l'origine `jambonpasfrais.github.io` est partagée avec geo-train et
   pkmon-training.
@@ -82,8 +82,9 @@ Autres règles :
 | `src/core/reserve.js` | tirage sans remise, révélation, jauge, blagues trash restantes |
 | `src/core/exhaustion.js` | messages d'épuisement, jamais deux fois de suite le même |
 | `src/core/storage.js` | seul module qui connaît le format stocké |
+| `src/ui/tour.js` | le tutoriel en visite guidée (dialogue modal, voile, placement de la bulle) |
 | `src/data/jokes.js` | la banque de blagues (CC BY 4.0) |
-| `styles/` | `base.css` (jetons, polices), puis une feuille par écran |
+| `styles/` | `base.css` (jetons, polices), `layout.css`, `components.css`, `tour.css` (tutoriel), puis une feuille par écran dans `screens/` |
 | `tests/` | `runner.js` (`collect`, `run`), `suites.js` (seule liste des suites), `run.mjs` (Node) |
 | `tools/` | `screenshot.mjs` ; jamais chargé par l'app |
 | `.github/` | formulaire « Proposer une blague », modèle de PR, Action de tests |

@@ -1,17 +1,3 @@
-.bouton-lien {
-  padding: 0;
-  border: 0;
-  background: transparent;
-  color: var(--sang);
-  font: inherit;
-  text-decoration: underline;
-  cursor: pointer;
-}
-
-.bouton-lien--pale {
-  color: var(--encre-pale);
-}
-
 .tour {
   position: fixed;
   inset: 0;
@@ -123,5 +109,11 @@
 @media (prefers-reduced-motion: reduce) {
   .tour__voile {
     transition: none;
+  }
+}
+
+@media (max-width: 899px) {
+  .tour__bulle {
+    width: calc(100% - 2rem);
   }
 }

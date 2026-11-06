@@ -212,5 +212,9 @@ Ces contrastes ont été mesurés avec la formule WCAG 2 le 04/11/2026.
 - Le tutoriel est un dialogue modal (`<dialog>` et `showModal()`) : le focus y
   reste enfermé et arrive sur « Suivant ». Le titre et le texte lui servent de
   nom et de description (`aria-labelledby`, `aria-describedby`), et le
-  raccourci des blagues est suspendu tant qu'il est ouvert. La bulle reprend les
+  raccourci des blagues est suspendu tant qu'il est ouvert. Comme pour le dialogue de
+  transfusion, Tab peut passer par l'interface du navigateur entre deux tours de
+  cycle : c'est le comportement natif de `showModal()`, accepté. À la fermeture,
+  le focus revient aussitôt sur « Achever », ou sur « Transfusion » sur l'écran
+  d'épuisement. La bulle reprend les
   couples déjà mesurés (`--encre` et `--encre-pale` sur `--velours`).

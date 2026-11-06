@@ -61,11 +61,12 @@ export function createTour({ trashCount, targets, bottomInset, onDisable, onClos
   const steps = stepTexts(trashCount);
   let index = 0;
   let frame = 0;
+  let active = false;
 
   const counter = text('p', '', { class: 'tour__compteur' });
   const title = text('h2', '', { id: 'tour-titre', class: 'tour__titre' });
   const body = text('p', '', { id: 'tour-texte', class: 'tour__texte' });
-  const skip = button({ class: 'bouton-lien', on: { click: () => node.close() } }, [frenchSpacing('Passer')]);
+  const skip = button({ class: 'bouton-lien', on: { click: () => finish() } }, [frenchSpacing('Passer')]);
   const previous = button({ class: 'bouton-secondaire', on: { click: () => go(index - 1) } }, [
     frenchSpacing('Précédent'),
   ]);
@@ -220,7 +221,7 @@ export function createTour({ trashCount, targets, bottomInset, onDisable, onClos
 
   function advance() {
     if (index === TOTAL - 1) {
-      node.close();
+      finish();
       return;
     }
     go(index + 1);
@@ -228,7 +229,31 @@ export function createTour({ trashCount, targets, bottomInset, onDisable, onClos
 
   function disable() {
     onDisable();
-    node.close();
+    finish();
+  }
+
+  function release() {
+    if (!active) {
+      return false;
+    }
+    active = false;
+    window.removeEventListener('resize', schedule);
+    window.removeEventListener('scroll', schedule, true);
+    window.removeEventListener('hashchange', finish);
+    if (frame !== 0) {
+      cancelAnimationFrame(frame);
+      frame = 0;
+    }
+    return true;
+  }
+
+  function finish() {
+    if (node.open) {
+      node.close();
+    }
+    if (release()) {
+      onClose();
+    }
   }
 
   function onKey(event) {
@@ -246,13 +271,9 @@ export function createTour({ trashCount, targets, bottomInset, onDisable, onClos
 
   node.addEventListener('keydown', onKey);
   node.addEventListener('close', () => {
-    window.removeEventListener('resize', schedule);
-    window.removeEventListener('scroll', schedule, true);
-    if (frame !== 0) {
-      cancelAnimationFrame(frame);
-      frame = 0;
+    if (release()) {
+      onClose();
     }
-    onClose();
   });
 
   function open() {
@@ -260,9 +281,11 @@ export function createTour({ trashCount, targets, bottomInset, onDisable, onClos
       return;
     }
     index = 0;
+    active = true;
     node.showModal();
     window.addEventListener('resize', schedule);
     window.addEventListener('scroll', schedule, true);
+    window.addEventListener('hashchange', finish);
     render({ initial: true });
     next.focus();
   }

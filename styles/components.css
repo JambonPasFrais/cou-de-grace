@@ -237,3 +237,17 @@
     transition: none;
   }
 }
+
+.bouton-lien {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--sang);
+  font: inherit;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.bouton-lien--pale {
+  color: var(--encre-pale);
+}

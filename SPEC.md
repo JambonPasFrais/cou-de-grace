@@ -126,8 +126,8 @@ remplace la blague :
   moment, sans changer le choix enregistré.
 - **Pendant la visite**, la barre d'espace et Entrée ne révèlent aucune chute,
   et rien n'est compté comme vu : elles activent le bouton de la bulle qui a le
-  focus, « Suivant » au départ. Échap équivaut à « Passer », → et Entrée à
-  « Suivant », ← à « Précédent ».
+  focus, « Suivant » au départ. Échap équivaut à « Passer », → à « Suivant », ← à
+  « Précédent ». Entrée active le bouton qui a le focus.
 
 ## 4. L'interrupteur « blagues trash »
 
@@ -154,7 +154,8 @@ strict minimum.
   ```
 
   Une clé écrite avant l'ajout du tutoriel, sans le champ `tutorial`, se lit
-  comme `tutorial: true` : la version reste `1`.
+  comme `tutorial: true` : la version reste `1`. Elle est réécrite une seule
+  fois au chargement suivant, sous la forme complète.
 
 - **Taille bornée** : au chargement, les identifiants qui ne sont plus dans la
   banque sont retirés. La clé ne dépasse donc jamais la taille de la banque :
